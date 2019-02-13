@@ -7,6 +7,7 @@ from PIL.ImageQt import ImageQt
 from matplotlib import numpy as np
 
 
+
 class MessageBox(QMessageBox):
     def __init__(self, s, *args, **kwargs):
         QMessageBox.__init__(self, *args, **kwargs)
@@ -18,7 +19,7 @@ class MessageBox(QMessageBox):
         for item in s:
             lay.addWidget(item)
         self.layout().addWidget(scroll, 0, 0, 1, self.layout().columnCount())
-        self.setStyleSheet("QScrollArea{min-width:200 px; min-height: 200px; border: 0}")
+        self.setStyleSheet("QScrollArea{min-width:200 px; min-height: 200px; border: 0; background-color: #201e1e;}")
 
 
 class Application(QMainWindow, QWidget):
@@ -89,7 +90,9 @@ class Application(QMainWindow, QWidget):
         self.lbl = QLabel(self)
         self.lbl.setPixmap(pix)
         self.lbl.resize(pix.width(), pix.height())
-        self.lbl.move(100, 100)
+        width = self.geometry().width()
+        height = self.geometry().height()
+        self.lbl.move(width/2 - pix.width()/2, height/2 - pix.height()/2)
         self.lbl.updateGeometry()
         self.lbl.update()
         self.update()
@@ -341,7 +344,7 @@ class Application(QMainWindow, QWidget):
         saveAct = self.saveButton()
         colorsAct = self.colorsButton()
         filtersAct = self.filtersButton()
-        self.statusBar().setStyleSheet("background-color: #201e1e; border: 1px #201e1e;")
+        self.statusBar().setStyleSheet("background-color: #201e1e; border: 1px #201e1e; QText{border-radius: 15}")
 
         self.menuBar().setStyleSheet("background-color: #201e1e; border: 1px #3a3636;")
         menubar = self.menuBar()
@@ -354,7 +357,8 @@ class Application(QMainWindow, QWidget):
         fileMenu.addAction(filtersAct)
 
         toolbar = self.addToolBar('Toolbar')
-        toolbar.setStyleSheet("background-color: #201e1e; border: 1px #201e1e; padding: 3px")
+        toolbar.orientation()
+        toolbar.setStyleSheet("background-color: #201e1e; border: 1px #201e1e; padding: 3px;")
         toolbar.addAction(exitAct)
         toolbar.addAction(saveAct)
         toolbar.addAction(colorsAct)
