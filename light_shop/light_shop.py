@@ -1,4 +1,4 @@
-import sys, os, pathlib, colorsys
+import sys, os, pathlib
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -6,23 +6,16 @@ from PIL import Image
 from PIL.ImageQt import ImageQt
 from matplotlib import numpy as np
 
+# librerie mie
+from Filters import Filters
+from MessageBox import MessageBox
 
-
-class MessageBox(QMessageBox):
-    def __init__(self, s, *args, **kwargs):
-        QMessageBox.__init__(self, *args, **kwargs)
-        scroll = QScrollArea(self)
-        scroll.setWidgetResizable(True)
-        self.content = QWidget()
-        scroll.setWidget(self.content)
-        lay = QVBoxLayout(self.content)
-        for item in s:
-            lay.addWidget(item)
-        self.layout().addWidget(scroll, 0, 0, 1, self.layout().columnCount())
-        self.setStyleSheet("QScrollArea{min-width:200 px; min-height: 200px; border: 0; background-color: #201e1e;}")
+# classe globale con cui richiamare i filtri
+filters = Filters()
 
 
 class Application(QMainWindow, QWidget):
+
 
     def __init__(self):
         super().__init__()
@@ -46,24 +39,20 @@ class Application(QMainWindow, QWidget):
 
         # Variabili immagine
         self.path = '/Users/alessandrolauria/Desktop/LightShop/light_shop/Images/image.jpg'
-        self.img = ''  # preview
-        self.real_img = ''  # immagine reale
-        self.test_img = ''  # immagine copia di img usata per preview operazioni
-        self.rsize = 400  # dimesione preview
-
+        self.img = ''           # preview
+        self.real_img = ''      # immagine reale
+        self.test_img = ''      # immagine copia di img usata per preview operazioni
+        self.rsize = 400        # dimesione preview
 
         self.lbl = QLabel(self)
 
         self.setGeometry(100, 100, 800, 600)
         self.setWindowIcon(QIcon('Images/icon.png'))
         # self.showFullScreen()
-        self.setStyleSheet("background-color: #423f3f;")
+        self.setStyleSheet("background-color: #423f3f; QText{color: #b4acac}")
         self.initUI()
 
     def initUI(self):
-
-        # textEdit = QTextEdit()
-        # self.setCentralWidget(textEdit)
 
         self.importImage()
 
@@ -74,16 +63,10 @@ class Application(QMainWindow, QWidget):
         self.menu()
         self.show()
 
-    def setImag(self, img):
-        self.img = img
-        self.showImage()
-
-    def setRealImage(self, real_img):
-        self.real_img = real_img
 
     # Richiamato per mostrare nel label l'immagine appena modificata
-    def showImage(self):
-        rgba_img = self.img.convert("RGBA")
+    def showImage(self, img):
+        rgba_img = img.convert("RGBA")
         qim = ImageQt(rgba_img)
         pix = QPixmap.fromImage(qim)
         self.lbl.deleteLater()
@@ -166,7 +149,7 @@ class Application(QMainWindow, QWidget):
             self.real_img.convert('RGB')
             self.img = self.real_img
             self.resize(self.rsize)
-        self.showImage()
+        self.showImage(self.test_img)
 
     # Filtro contrasto
     # funzione sigmoide
@@ -174,6 +157,15 @@ class Application(QMainWindow, QWidget):
         self.color_filter_pressed = "contr"
         self.lumPosition = 0
         self.satPosition = 0
+
+        if self.apply_contr_filter:
+            self.real_img = filters.contrastFilter(index, self.real_img)
+            self.img = filters.contrastFilter(index, self.img)
+            self.showImage(self.img)
+        else:
+            self.test_img = filters.luminanceFilter(index, self.img)
+            self.showImage(self.test_img)
+        '''
         if self.apply_contr_filter == False:
             self.img = self.real_img
             self.resize(self.rsize)
@@ -204,41 +196,24 @@ class Application(QMainWindow, QWidget):
             self.real_img = Image.fromarray(result, 'RGB')
             self.img = self.real_img
             self.resize(self.rsize)
-        self.showImage()
+        self.showImage(self.test_img)
+        '''
 
     # filtro luminosità
     def luminanceFilter(self, index):
         self.color_filter_pressed = "lum"
         self.contrPosition = 0
         self.satPosition = 0
-        if self.apply_lum_filter == False:
-            self.img = self.real_img
-            self.resize(self.rsize)
-            px = self.img.load()
-            width, height = self.img.size
-
-        else:
-            px = self.real_img.load()
-            width, height = self.real_img.size
-
-        result = np.zeros((height, width, 3), dtype=np.uint8)
-
-        for i in range(0, height):
-            for j in range(0, width):
-                red, green, blue = px[j, i]
-                red += index
-                green += index
-                blue += index
-                rgb = self.mantainInRange(red, green, blue)
-                result[i, j] = rgb
 
         self.lumPosition = index
-        if self.apply_lum_filter == False: self.img = Image.fromarray(result, 'RGB')
+
+        if self.apply_lum_filter:
+            self.real_img = filters.luminanceFilter(index, self.real_img)
+            self.img = filters.luminanceFilter(index,self.img)
+            self.showImage(self.img)
         else:
-            self.real_img = Image.fromarray(result, 'RGB')
-            self.img = self.real_img
-            self.resize(self.rsize)
-        self.showImage()
+            self.test_img = filters.luminanceFilter(index,self.img)
+            self.showImage(self.test_img)
 
     # filtro di media aritmetica
     def arithmeticMeanFilter(self):
@@ -275,7 +250,7 @@ class Application(QMainWindow, QWidget):
             self.real_img = Image.fromarray(result, 'RGB')
             self.img = self.real_img
             self.resize(self.rsize)
-        self.showImage()
+        self.showImage(self.test_img)
 
     # filtro di media geometrica
     def geometricMeanFilter(self):
@@ -313,14 +288,14 @@ class Application(QMainWindow, QWidget):
             self.real_img = Image.fromarray(result, 'RGB')
             self.img = self.real_img
             self.resize(self.rsize)
-        self.showImage()
+        self.showImage(self.test_img)
 
     def greyScale(self):
         print("greyscale")
         # self.img = self.img.resize([100,100],0)
         self.img = self.img.convert('LA')
         self.real_img = self.img.convert('LA')
-        self.showImage()
+        self.showImage(self.img)
 
     def importImage(self):
         print("path: ", self.path)
@@ -329,7 +304,7 @@ class Application(QMainWindow, QWidget):
         self.img = self.real_img
         self.test_img = self.real_img
         self.resize(self.rsize)
-        self.showImage()
+        self.showImage(self.img)
 
         #else: print("Nothing imported")
 
@@ -439,7 +414,7 @@ class Application(QMainWindow, QWidget):
         else:
             self.img = self.real_img
             self.resize(self.rsize)
-            self.showImage()
+            self.showImage(self.img)
             print("Not modified")
 
     def applyBlurFilter(self, btn):
@@ -457,7 +432,7 @@ class Application(QMainWindow, QWidget):
         else:
             self.img = self.real_img
             self.resize(self.rsize)
-            self.showImage()
+            self.showImage(self.img)
             print("Not modified")
 
     def saveImage(self, btn):
@@ -502,7 +477,7 @@ class Application(QMainWindow, QWidget):
             print("file ignored")
             e.ignore()
 
-        self.showImage()
+        self.showImage(self.img)
 
 
 if __name__ == '__main__':
