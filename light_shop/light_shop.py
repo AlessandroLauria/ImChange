@@ -112,44 +112,16 @@ class Application(QMainWindow, QWidget):
         self.color_filter_pressed = "sat"
         self.lumPosition = 0
         self.contrPosition = 0
-        if self.apply_lum_filter == False:
-            self.img = self.real_img
-            self.resize(self.rsize)
-            self.img.convert('HSV')
-            px = self.img.load()
-            width, height = self.img.size
 
-        else:
-            self.real_img.convert('HSV')
-            px = self.real_img.load()
-            width, height = self.real_img.size
-
-        print("p[100,100]: ", px[100, 100])
-        result = np.zeros((height, width, 3), dtype=np.uint8)
-        div = 1
-
-        for i in range(0, height):
-            for j in range(0, width):
-                hue, sat, value = px[j, i]
-                sat += index / div
-                if sat >= 255: sat = 255
-                if sat <= 0: sat = 0
-                rgb = tuple([hue,sat, value])
-                result[i, j] = rgb
-
-        print("result[100,100]: ", result[100, 100])
         self.satPosition = index
-        self.img = Image.fromarray(result, 'HSV')
 
-        if self.apply_sat_filter == False:
-            self.img = Image.fromarray(result, 'HSV')
-            self.img.convert('RGB')
+        if self.apply_sat_filter:
+            self.real_img = filters.saturationFilter(index, self.real_img)
+            self.img = filters.saturationFilter(index, self.img)
+            self.showImage(self.img)
         else:
-            self.real_img = Image.fromarray(result, 'HSV')
-            self.real_img.convert('RGB')
-            self.img = self.real_img
-            self.resize(self.rsize)
-        self.showImage(self.test_img)
+            self.test_img = filters.saturationFilter(index, self.img)
+            self.showImage(self.test_img)
 
     # Filtro contrasto
     # funzione sigmoide
@@ -158,46 +130,16 @@ class Application(QMainWindow, QWidget):
         self.lumPosition = 0
         self.satPosition = 0
 
+        self.contrPosition = index
+
         if self.apply_contr_filter:
             self.real_img = filters.contrastFilter(index, self.real_img)
             self.img = filters.contrastFilter(index, self.img)
             self.showImage(self.img)
         else:
-            self.test_img = filters.luminanceFilter(index, self.img)
+            self.test_img = filters.contrastFilter(index, self.img)
             self.showImage(self.test_img)
-        '''
-        if self.apply_contr_filter == False:
-            self.img = self.real_img
-            self.resize(self.rsize)
-            px = self.img.load()
-            width, height = self.img.size
 
-        else:
-            px = self.real_img.load()
-            width, height = self.real_img.size
-
-        result = np.zeros((height, width, 3), dtype=np.uint8)
-
-        factor = (259.0 * (index + 255.0)) / (255.0 * (259.0 - index))
-
-        for i in range(0, height):
-            for j in range(0, width):
-                red, green, blue = px[j,i]
-                red = factor * (red - 128.0) + 128.0
-                green = factor * (green - 128.0) + 128.0
-                blue = factor * (blue - 128.0) + 128.0
-                rgb = self.mantainInRange(red, green, blue)
-                result[i, j] = rgb
-
-        self.contrPosition = index
-        if self.apply_contr_filter == False:
-            self.img = Image.fromarray(result, 'RGB')
-        else:
-            self.real_img = Image.fromarray(result, 'RGB')
-            self.img = self.real_img
-            self.resize(self.rsize)
-        self.showImage(self.test_img)
-        '''
 
     # filtro luminosità
     def luminanceFilter(self, index):

@@ -1,8 +1,27 @@
-
 from matplotlib import numpy as np
 from PIL import Image
 
 class Filters():
+
+    def saturationFilter(self, index, img):
+        px = img.load()
+        width, height = img.size
+
+        result = np.zeros((height, width, 3), dtype=np.uint8)
+        div = 1
+
+        for i in range(0, height):
+            for j in range(0, width):
+                hue, sat, value = px[j, i]
+                sat += index / div
+                if sat >= 255: sat = 255
+                if sat <= 0: sat = 0
+                rgb = tuple([hue, sat, value])
+                result[i, j] = rgb
+
+        img = Image.fromarray(result, 'HSV')
+        img.convert("RGB")
+        return img
 
     def luminanceFilter(self,index,img):
         px = img.load()
