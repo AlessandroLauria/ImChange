@@ -1,26 +1,71 @@
 from matplotlib import numpy as np
 from PIL import Image
-
+import colorsys
 class Filters():
+
+    def geometricMeanFilter(self,img):
+        px = img.load()
+        width, height = img.size
+        result = np.zeros((height, width, 3), dtype=np.uint8)
+
+        # kernel 9x9
+        for i in range(4, height - 4):
+            for j in range(4, width - 4):
+                prod_red, prod_green, prod_blue = (1, 1, 1)
+                for n in range(i - 4, i + 4):
+                    for m in range(j - 4, j + 4):
+                        r, g, b = px[m, n]
+                        prod_red *= r
+                        prod_green *= g
+                        prod_blue *= b
+
+                result[i, j] = tuple([prod_red ** (1 / 64), prod_green ** (1 / 64), prod_blue ** (1 / 64)])
+
+        img = Image.fromarray(result, 'RGB')
+        return img
+
+    def arithmeticMeanFilter(self,img):
+        px = img.load()
+        width, height = img.size
+
+        result = np.zeros((height, width, 3), dtype=np.uint8)
+
+        for i in range(3, height - 3):
+            for j in range(3, width - 3):
+                sum_red, sum_green, sum_blue = (0, 0, 0)
+                for n in range(i - 3, i + 3):
+                    for m in range(j - 3, j + 3):
+                        r, g, b = px[m, n]
+                        sum_red += r
+                        sum_green += g
+                        sum_blue += b
+
+                result[i, j] = tuple([sum_red / 49, sum_green / 49, sum_blue / 49])
+
+        img = Image.fromarray(result, 'RGB')
+        return img
 
     def saturationFilter(self, index, img):
         px = img.load()
         width, height = img.size
 
         result = np.zeros((height, width, 3), dtype=np.uint8)
-        div = 1
+
+        #r,g,b = px[100,100]
+        #h, s, v = colorsys.rgb_to_hsv(r, g, b)
+        #print("\nsaturation: ",h," ",s," ",v)
 
         for i in range(0, height):
             for j in range(0, width):
-                hue, sat, value = px[j, i]
-                sat += index / div
-                if sat >= 255: sat = 255
-                if sat <= 0: sat = 0
-                rgb = tuple([hue, sat, value])
+                r, g, b = px[j, i]
+
+                h, s, v = colorsys.rgb_to_hsv(r, g, b)
+                s += index/255
+                r, g, b = colorsys.hsv_to_rgb(h,s,v)
+                rgb = self.mantainInRange(r,g,b)
                 result[i, j] = rgb
 
-        img = Image.fromarray(result, 'HSV')
-        img.convert("RGB")
+        img = Image.fromarray(result, 'RGB')
         return img
 
     def luminanceFilter(self,index,img):

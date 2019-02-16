@@ -91,7 +91,7 @@ class Application(QMainWindow, QWidget):
         if blue <= 0: blue = 0
         return tuple([red, green, blue])
 
-    # Slider per aumentare/diminuire la luminosità
+    # Slider per aumentare/diminuire la luminosita'
     def slider(self, function, position):
         sld = QSlider(Qt.Horizontal, self)
         sld.setMinimum(-255)
@@ -141,7 +141,7 @@ class Application(QMainWindow, QWidget):
             self.showImage(self.test_img)
 
 
-    # filtro luminosità
+    # filtro luminosita'
     def luminanceFilter(self, index):
         self.color_filter_pressed = "lum"
         self.contrPosition = 0
@@ -161,83 +161,26 @@ class Application(QMainWindow, QWidget):
     def arithmeticMeanFilter(self):
 
         self.blur_filter_pressed = "arith"
-        if self.apply_arith_mean == False:
-            self.img = self.real_img
-            self.resize(self.rsize)
-            px = self.img.load()
-            width, height = self.img.size
+
+        if self.apply_arith_mean:
+            self.real_img = filters.arithmeticMeanFilter(self.real_img)
+            self.showImage(self.img)
         else:
-            px = self.real_img.load()
-            width, height = self.real_img.size
+            self.img = filters.arithmeticMeanFilter(self.img)
+            self.showImage(self.img)
 
-        result = np.zeros((height, width, 3), dtype=np.uint8)
-
-        for i in range(3, height - 3):
-            for j in range(3, width - 3):
-                sum_red, sum_green, sum_blue = (0, 0, 0)
-                for n in range(i - 3, i + 3):
-                    for m in range(j - 3, j + 3):
-                        r, g, b = px[m, n]
-                        sum_red += r
-                        sum_green += g
-                        sum_blue += b
-
-                result[i, j] = tuple([sum_red / 49, sum_green / 49, sum_blue / 49])
-
-        if self.apply_arith_mean == False:
-            print("arith filter to preview")
-            self.img = Image.fromarray(result, 'RGB')
-        else:
-            print("arith filter to real image")
-            self.real_img = Image.fromarray(result, 'RGB')
-            self.img = self.real_img
-            self.resize(self.rsize)
-        self.showImage(self.test_img)
 
     # filtro di media geometrica
     def geometricMeanFilter(self):
 
         self.blur_filter_pressed = "geomet"
-        if self.apply_geomet_mean == False:
-            self.img = self.real_img
-            self.resize(self.rsize)
-            px = self.img.load()
-            width, height = self.img.size
+
+        if self.apply_arith_mean:
+            self.real_img = filters.geometricMeanFilter(self.real_img)
+            self.showImage(self.img)
         else:
-            px = self.real_img.load()
-            width, height = self.real_img.size
-
-        result = np.zeros((height, width, 3), dtype=np.uint8)
-
-        # kernel 9x9
-        for i in range(4, height - 4):
-            for j in range(4, width - 4):
-                prod_red, prod_green, prod_blue = (1, 1, 1)
-                for n in range(i - 4, i + 4):
-                    for m in range(j - 4, j + 4):
-                        r, g, b = px[m, n]
-                        prod_red *= r
-                        prod_green *= g
-                        prod_blue *= b
-
-                result[i, j] = tuple([prod_red ** (1 / 64), prod_green ** (1 / 64), prod_blue ** (1 / 64)])
-
-        if self.apply_geomet_mean == False:
-            print("geomet filter to preview")
-            self.img = Image.fromarray(result, 'RGB')
-        else:
-            print("geomet filter to real image")
-            self.real_img = Image.fromarray(result, 'RGB')
-            self.img = self.real_img
-            self.resize(self.rsize)
-        self.showImage(self.test_img)
-
-    def greyScale(self):
-        print("greyscale")
-        # self.img = self.img.resize([100,100],0)
-        self.img = self.img.convert('LA')
-        self.real_img = self.img.convert('LA')
-        self.showImage(self.img)
+            self.img = filters.geometricMeanFilter(self.img)
+            self.showImage(self.img)
 
     def importImage(self):
         print("path: ", self.path)
