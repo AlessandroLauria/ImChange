@@ -4,14 +4,16 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PIL import Image
 from PIL.ImageQt import ImageQt
-from matplotlib import numpy as np
+#from matplotlib import numpy as np
 
-# librerie mie
+# My Libraries
 from Filters import Filters
 from MessageBox import MessageBox
 
-# classe globale con cui richiamare i filtri
+# Global class with I call filters method
 filters = Filters()
+
+path_to_image = "Images/"
 
 
 class Application(QMainWindow, QWidget):
@@ -20,16 +22,17 @@ class Application(QMainWindow, QWidget):
     def __init__(self):
         super().__init__()
 
-        # Variabili filtri
+        # Filters Variables
         self.lumPosition = 0
         self.contrPosition = 0
         self.satPosition = 0
 
-        # Check operazione da applicare
+        # Check operation to apply
         self.blur_filter_pressed = ""
         self.color_filter_pressed = ""
+        self.edge_filter_pressed = ""
 
-        # decide se applicare le modifiche all'immagine originale
+        # Choose if apply modification to the real image
         self.apply_arith_mean = False
         self.apply_geomet_mean = False
 
@@ -37,8 +40,11 @@ class Application(QMainWindow, QWidget):
         self.apply_sat_filter = False
         self.apply_contr_filter = False
 
-        # Variabili immagine
-        self.path = '/Users/alessandrolauria/Desktop/LightShop/light_shop/Images/image.jpg'
+        self.apply_canny_filter = False
+        self.apply_drog_filter = False
+
+        # General image variables
+        self.path = '/Users/alessandrolauria/Desktop/LightShop/light_shop/Images/lena15.jpg'
         self.img = ''           # preview
         self.real_img = ''      # immagine reale
         self.test_img = ''      # immagine copia di img usata per preview operazioni
@@ -47,7 +53,7 @@ class Application(QMainWindow, QWidget):
         self.lbl = QLabel(self)
 
         self.setGeometry(100, 100, 800, 600)
-        self.setWindowIcon(QIcon('Images/icon.png'))
+        self.setWindowIcon(QIcon(path_to_image + 'icon.png'))
         # self.showFullScreen()
         self.setStyleSheet("background-color: #423f3f; QText{color: #b4acac}")
         self.initUI()
@@ -56,7 +62,7 @@ class Application(QMainWindow, QWidget):
 
         self.importImage()
 
-        self.setWindowTitle('FastImage')
+        self.setWindowTitle('LightShop')
 
         self.setAcceptDrops(True)
 
@@ -64,7 +70,7 @@ class Application(QMainWindow, QWidget):
         self.show()
 
 
-    # Richiamato per mostrare nel label l'immagine appena modificata
+    # Used to show on the label the image passed as parameter
     def showImage(self, img):
         rgba_img = img.convert("RGBA")
         qim = ImageQt(rgba_img)
@@ -81,7 +87,7 @@ class Application(QMainWindow, QWidget):
         self.update()
         self.lbl.show()
 
-    # Evito che i valori RGB sforino il range
+    # Check if the RGB values go outline
     def mantainInRange(self, red, green, blue):
         if red >= 255: red = 255
         if green >= 255: green = 255
@@ -91,11 +97,12 @@ class Application(QMainWindow, QWidget):
         if blue <= 0: blue = 0
         return tuple([red, green, blue])
 
-    # Slider per aumentare/diminuire la luminosita'
+    # Create a slider that call a specific function when the index of the slider
+    # change value. Call the function with passing the specific index
     def slider(self, function, position):
         sld = QSlider(Qt.Horizontal, self)
-        sld.setMinimum(-255)
-        sld.setMaximum(255)
+        sld.setMinimum(-127)
+        sld.setMaximum(127)
         sld.setTickInterval(position)
         sld.setFocusPolicy(Qt.NoFocus)
         # sld.setGeometry(100, 100, 100, 30)
@@ -107,7 +114,7 @@ class Application(QMainWindow, QWidget):
         btn.clicked.connect(function)
         return btn
 
-    # Filtro saturazione
+    # Saturation filter
     def saturationFilter(self, index):
         self.color_filter_pressed = "sat"
         self.lumPosition = 0
@@ -123,7 +130,7 @@ class Application(QMainWindow, QWidget):
             self.test_img = filters.saturationFilter(index, self.img)
             self.showImage(self.test_img)
 
-    # Filtro contrasto
+    # Contrast filter
     # funzione sigmoide
     def contrastFilter(self, index):
         self.color_filter_pressed = "contr"
@@ -141,7 +148,7 @@ class Application(QMainWindow, QWidget):
             self.showImage(self.test_img)
 
 
-    # filtro luminosita'
+    # Luminance filter
     def luminanceFilter(self, index):
         self.color_filter_pressed = "lum"
         self.contrPosition = 0
@@ -157,7 +164,7 @@ class Application(QMainWindow, QWidget):
             self.test_img = filters.luminanceFilter(index,self.img)
             self.showImage(self.test_img)
 
-    # filtro di media aritmetica
+    # Arithmetic Mean Filter
     def arithmeticMeanFilter(self):
 
         self.blur_filter_pressed = "arith"
@@ -170,7 +177,7 @@ class Application(QMainWindow, QWidget):
             self.showImage(self.img)
 
 
-    # filtro di media geometrica
+    # Geometric Mean Filter
     def geometricMeanFilter(self):
 
         self.blur_filter_pressed = "geomet"
@@ -182,6 +189,30 @@ class Application(QMainWindow, QWidget):
             self.img = filters.geometricMeanFilter(self.img)
             self.showImage(self.img)
 
+    def cannyFilter(self):
+
+        self.edge_filter_pressed = "canny"
+
+        if self.apply_canny_filter:
+            self.real_img = filters.cannyEdgeDetectorFilter(self.real_img)
+            self.showImage(self.img)
+        else:
+            self.img = filters.cannyEdgeDetectorFilter(self.img)
+            self.showImage(self.img)
+
+    def drogFilter(self):
+
+        self.edge_filter_pressed = "drog"
+
+        if self.apply_drog_filter:
+            self.real_img = filters.drogEdgeDetectorFilter(self.real_img)
+            self.showImage(self.img)
+            print("Drog applied")
+        else:
+            self.img = filters.drogEdgeDetectorFilter(self.img)
+            self.showImage(self.img)
+
+    # Used to load the Image in the label and set related parameters
     def importImage(self):
         print("path: ", self.path)
         #if os.path.exists(pathlib.Path(self.path)):
@@ -193,6 +224,7 @@ class Application(QMainWindow, QWidget):
 
         #else: print("Nothing imported")
 
+    # resize dimension of the preview image
     def resize(self, width):
         wpercent = (width / float(self.img.size[0]))
         hsize = int((float(self.img.size[1]) * float(wpercent)))
@@ -204,9 +236,10 @@ class Application(QMainWindow, QWidget):
         saveAct = self.saveButton()
         colorsAct = self.colorsButton()
         filtersAct = self.filtersButton()
-        self.statusBar().setStyleSheet("background-color: #201e1e; border: 1px #201e1e; QText{border-radius: 15}")
+        edgesAct = self.edgesButton()
+        self.statusBar().setStyleSheet("background-color: #201e1e; border: 1px #201e1e;")
 
-        self.menuBar().setStyleSheet("background-color: #201e1e; border: 1px #3a3636;")
+        self.menuBar().setStyleSheet("background-color: #201e1e; border: 1px #3a3636")
         menubar = self.menuBar()
         menubar.setNativeMenuBar(False)
         fileMenu = menubar.addMenu('&File')
@@ -215,6 +248,7 @@ class Application(QMainWindow, QWidget):
         fileMenu = menubar.addMenu('&Edit')
         fileMenu.addAction(colorsAct)
         fileMenu.addAction(filtersAct)
+        fileMenu.addAction(edgesAct)
 
         toolbar = self.addToolBar('Toolbar')
         toolbar.orientation()
@@ -223,21 +257,31 @@ class Application(QMainWindow, QWidget):
         toolbar.addAction(saveAct)
         toolbar.addAction(colorsAct)
         toolbar.addAction(filtersAct)
+        toolbar.addAction(edgesAct)
+
+    # Buttons showed in toolbar and menu
+    def edgesButton(self):
+        edgesAct = QAction(QIcon(path_to_image + 'edge.png'), 'Blur Filters', self)
+        edgesAct.setShortcut('ctrl+e')
+        edgesAct.setStatusTip('Apply Edge Detection Filter')
+        edgesAct.triggered.connect(self.cannyFilterBox)
+        return edgesAct
 
     def filtersButton(self):
-        filterAct = QAction(QIcon('Images/filter.png'), 'Blur Filters', self)
+        filterAct = QAction(QIcon(path_to_image + 'blur.png'), 'Blur Filters', self)
         filterAct.setShortcut('ctrl+f')
         filterAct.setStatusTip('Apply Blur Filters')
         filterAct.triggered.connect(self.blurFilterBox)
         return filterAct
 
     def colorsButton(self):
-        colorsAct = QAction(QIcon('Images/sliders.png'), 'Color change', self)
+        colorsAct = QAction(QIcon(path_to_image + 'sliders.png'), 'Color change', self)
         colorsAct.setShortcut('ctrl+c')
         colorsAct.setStatusTip('Change Luminance, Contrast or Saturation')
         colorsAct.triggered.connect(self.colorBox)
         return colorsAct
 
+    # Message Box that shows operation can be done
     def blurFilterBox(self):
         arith_mean_btn = self.button(self.arithmeticMeanFilter, "Arithmetic Blur Filter")
         geomet_mean_btn = self.button(self.geometricMeanFilter, "Geometric Blur Filter")
@@ -245,6 +289,16 @@ class Application(QMainWindow, QWidget):
         result = MessageBox(widget, None)
         result.setStandardButtons(QMessageBox.Apply | QMessageBox.Cancel)
         result.buttonClicked.connect(self.applyBlurFilter)
+        result.exec_()
+
+    def cannyFilterBox(self):
+        canny_btn = self.button(self.cannyFilter, "Canny")
+        drog_btn = self.button(self.drogFilter, "Drog")
+        widget = [canny_btn, drog_btn]
+        result = MessageBox(widget, None)
+        result.setDefaultButton(QMessageBox.Apply)
+        result.setStandardButtons(QMessageBox.Apply | QMessageBox.Cancel)
+        result.buttonClicked.connect(self.applyEdgeDetectionFilter)
         result.exec_()
 
 
@@ -264,7 +318,7 @@ class Application(QMainWindow, QWidget):
         result.exec_()
 
     def saveButton(self):
-        saveAct = QAction(QIcon('Images/save.png'), 'Save', self)
+        saveAct = QAction(QIcon(path_to_image + 'save.png'), 'Save', self)
         saveAct.setShortcut('ctrl+s')
         saveAct.setStatusTip('Save Image')
         saveAct.triggered.connect(self.saveDialog)
@@ -320,13 +374,32 @@ class Application(QMainWindow, QWidget):
             self.showImage(self.img)
             print("Not modified")
 
+    def applyEdgeDetectionFilter(self, btn):
+        if btn.text() == "Apply":
+            if self.edge_filter_pressed == "canny":
+                self.apply_canny_filter = True
+                self.cannyFilter()
+                self.apply_canny_filter = False
+
+            if self.edge_filter_pressed == "drog":
+                self.apply_drog_filter = True
+                self.drogFilter()
+                self.apply_drog_filter = False
+
+        else:
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.showImage(self.img)
+            print("Not modified")
+
+
     def saveImage(self, btn):
         if btn.text() == "Save":
             print("saved")
             self.real_img.save("test.jpeg", quality=80)
 
     def exitButton(self):
-        exitAct = QAction(QIcon('Images/exit.png'), 'Exit', self)
+        exitAct = QAction(QIcon(path_to_image + 'exit.png'), 'Exit', self)
         exitAct.setShortcut('ctrl+q')
         exitAct.setStatusTip('Exit application')
         exitAct.triggered.connect(self.close)
