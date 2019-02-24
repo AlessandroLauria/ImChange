@@ -13,6 +13,28 @@ class Filters():
 
         canny = cv2.Canny(open_cv_image, 100, 200)
         '''
+
+        img = img.convert('L')
+        open_cv_image = np.array(img)
+
+        # 1) Applied Gaussian blur to reduce noise in the image
+        cv2.GaussianBlur(open_cv_image, (15, 15), 0)
+
+        # Step2: Calculating gradient magnitudes and directions
+
+        kernel_size = 3
+        sobelx = cv2.Sobel(open_cv_image, cv2.CV_64F, 1, 0, kernel_size)
+        sobely = cv2.Sobel(open_cv_image, cv2.CV_64F, 0, 1, kernel_size)
+
+        sobelx = np.uint8(np.absolute(sobelx))
+        sobely = np.uint8(np.absolute(sobely))
+
+        sobelCombined = cv2.bitwise_or(sobelx, sobely)
+        #magnitudes = sqrt(sobelx** + sobely**2)
+
+
+        #cv2.imshow("test", open_cv_image)
+        img = Image.fromarray(open_cv_image)
         print("canny")
         return img
 
@@ -71,14 +93,28 @@ class Filters():
 
         # Create sobel x and y matrix
         sobel_x = np.array([[-1, 0, 1],
-                            [-2, 0, 2],
+                            [-1, 0, 1],
                             [-1, 0, 1]])
 
-        sobel_y = np.array([[-1, -2, -1],
+        sobel_y = np.array([[-1, -1, -1],
                             [0, 0, 0],
-                            [1, 2, 1]])
+                            [1, 1, 1]])
 
-        kernel_dim = 1  # 3*3
+        kernel1 = np.zeros(open_cv_image.shape)
+        kernel1[:sobel_x.shape[0], :sobel_x.shape[1]] = sobel_x
+        kernel1 = np.fft.fft2(kernel1)
+
+        kernel2 = np.zeros(open_cv_image.shape)
+        kernel2[:sobel_y.shape[0], :sobel_y.shape[1]] = sobel_y
+        kernel2 = np.fft.fft2(kernel2)
+
+
+        im = np.array(open_cv_image)
+        fim = np.fft.fft2(im)
+        Gx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
+        Gy = np.real(np.fft.ifft2(kernel2 * fim)).astype(float)
+
+        '''kernel_dim = 1  # 3*3
         result = np.array(img)
 
         for i in range(kernel_dim, height - kernel_dim):
@@ -93,7 +129,8 @@ class Filters():
                 result[j, i] = abs(sum_x) + abs(sum_y)
 
         open_cv_image = np.array(result)
-
+        '''
+        open_cv_image = abs(Gx/4) + abs(Gy/4)
         img = Image.fromarray(open_cv_image)
         return img
 
@@ -102,6 +139,9 @@ class Filters():
         return img
 
     def geometricMeanFilter(self, img):
+        img = img.convert('RGB')
+
+        '''
         px = img.load()
         width, height = img.size
         result = np.zeros((height, width, 3), dtype=np.uint8)
@@ -124,11 +164,48 @@ class Filters():
 
         img = Image.fromarray(result, 'RGB')
         return img
+        
+        '''
+
+        img = img.convert('RGB')
+        open_cv_image = np.array(img)
+        red = open_cv_image[:, :, 0]
+        green = open_cv_image[:, :, 1]
+        blue = open_cv_image[:, :, 2]
+
+        width, height, _ = open_cv_image.shape
+
+        mean_geometric = np.ones((9, 9))
+
+        kernel1 = np.zeros((width, height))
+        kernel1[:mean_geometric.shape[0], :mean_geometric.shape[1]] = mean_geometric
+        kernel1 = np.fft.fft2(kernel1)
+
+        im = np.array(red)
+        fim = np.fft.fft2(im)
+        Rx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
+
+        im = np.array(green)
+        fim = np.fft.fft2(im)
+        Gx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
+
+        im = np.array(blue)
+        fim = np.fft.fft2(im)
+        Bx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
+
+        open_cv_image[:, :, 0] = abs(Rx)
+        open_cv_image[:, :, 1] = abs(Gx)
+        open_cv_image[:, :, 2] = abs(Bx)
+
+        img = Image.fromarray(open_cv_image)
+
+        return img
 
     def arithmeticMeanFilter(self, img):
+
+        ''' OLD IMPLEMENTATION
         px = img.load()
         width, height = img.size
-
         result = np.zeros((height, width, 3), dtype=np.uint8)
 
         kernel_dim = 1
@@ -145,10 +222,63 @@ class Filters():
 
                 result[i, j] = tuple([sum_red / 9, sum_green / 9, sum_blue / 9])
 
-        img = Image.fromarray(result, 'RGB')
+        '''
+
+        img = img.convert('RGB')
+        open_cv_image = np.array(img)
+        red = open_cv_image[:, :, 0]
+        green = open_cv_image[:, :, 1]
+        blue = open_cv_image[:, :, 2]
+
+        mean_arithmetic = np.ones((9, 9))*(1/81)
+
+        width, height, _ = open_cv_image.shape
+
+        kernel1 = np.zeros((width, height))
+        kernel1[:mean_arithmetic.shape[0], :mean_arithmetic.shape[1]] = mean_arithmetic
+        kernel1 = np.fft.fft2(kernel1)
+
+
+        im = np.array(red)
+        fim = np.fft.fft2(im)
+        Rx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
+
+        im = np.array(green)
+        fim = np.fft.fft2(im)
+        Gx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
+
+        im = np.array(blue)
+        fim = np.fft.fft2(im)
+        Bx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
+
+        open_cv_image[:, :, 0] = abs(Rx)
+        open_cv_image[:, :, 1] = abs(Gx)
+        open_cv_image[:, :, 2] = abs(Bx)
+
+        img = Image.fromarray(open_cv_image)
+
         return img
 
     def saturationFilter(self, index, img):
+
+        img = img.convert('RGB')
+        open_cv_image = np.array(img)
+
+        # Same logic of luminance filter
+        hsv = cv2.cvtColor(open_cv_image, cv2.COLOR_RGB2HSV).astype("float32")
+        s = hsv[:, :, 1]
+        s += index
+        s[s >= 255] = 255
+        s[s <= 0] = 0
+
+        hsv[:, :, 1] = s
+        img = cv2.cvtColor(hsv.astype("uint8"), cv2.COLOR_HSV2RGB)
+        img = Image.fromarray(img)
+        return img
+
+
+        '''
+        img = img.convert('RGB')
         px = img.load()
         width, height = img.size
 
@@ -168,8 +298,28 @@ class Filters():
 
         img = Image.fromarray(result, 'RGB')
         return img
+        '''
 
     def luminanceFilter(self, index, img):
+
+        img = img.convert('RGB')
+        open_cv_image = np.array(img)
+
+        # Change color space to use the Value of HSV to manipulate the luminance
+        # the rest of code is similar to other color filter
+        hsv = cv2.cvtColor(open_cv_image, cv2.COLOR_RGB2HSV).astype("float32")
+        v = hsv[:, :, 2]
+        v += index
+        v[v >= 255] = 255
+        v[v <= 0] = 0
+
+        hsv[:, :, 2] = v
+        img = cv2.cvtColor(hsv.astype("uint8"), cv2.COLOR_HSV2RGB)
+        img = Image.fromarray(img)
+        return img
+
+
+        '''
         px = img.load()
         width, height = img.size
 
@@ -186,8 +336,48 @@ class Filters():
 
         img = Image.fromarray(result, 'RGB')
         return img
+        
+        '''
+
+
 
     def contrastFilter(self, index, img):
+
+        img = img.convert('RGB')
+        open_cv_image = np.array(img)
+
+        # Select the three different channels
+        red = open_cv_image[:, :, 0]
+        green = open_cv_image[:, :, 1]
+        blue = open_cv_image[:, :, 2]
+
+        # factor used to apply the contrast function
+        factor = (259.0 * (index + 255.0)) / (255.0 * (259.0 - index))
+
+        # Calculate the new value for each pixel in the channel
+        red = factor * (red - 128.0) + 128.0
+        green = factor * (green - 128.0) + 128.0
+        blue = factor * (blue - 128.0) + 128.0
+
+        # Ensure that the value of pixels not go out of RGB range
+        red[red >= 255] = 255
+        red[red <= 0] = 0
+        green[green >= 255] = 255
+        green[green <= 0] = 0
+        blue[blue >= 255] = 255
+        blue[blue <= 0] = 0
+
+        # Set the matrix image with the new arrays
+        open_cv_image[:, :, 0] = red
+        open_cv_image[:, :, 1] = green
+        open_cv_image[:, :, 2] = blue
+
+        # Convert the matrix to a PIL image that will show in the label
+        img = Image.fromarray(open_cv_image)
+        return img
+
+        '''
+        img = img.convert('RGB')
 
         px = img.load()
         width, height = img.size
@@ -207,6 +397,7 @@ class Filters():
 
         img = Image.fromarray(result, 'RGB')
         return img
+        '''
 
     def mantainInRange(self, red, green, blue):
         if red >= 255: red = 255

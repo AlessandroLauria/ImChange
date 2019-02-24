@@ -44,7 +44,7 @@ class Application(QMainWindow, QWidget):
         self.apply_drog_filter = False
 
         # General image variables
-        self.path = '/Users/alessandrolauria/Desktop/LightShop/light_shop/Images/lena15.jpg'
+        self.path = '/Users/alessandrolauria/Desktop/LightShop/light_shop/Images/image.jpg'
         self.img = ''           # preview
         self.real_img = ''      # immagine reale
         self.test_img = ''      # immagine copia di img usata per preview operazioni
@@ -99,10 +99,10 @@ class Application(QMainWindow, QWidget):
 
     # Create a slider that call a specific function when the index of the slider
     # change value. Call the function with passing the specific index
-    def slider(self, function, position):
+    def slider(self, function, position, minimum=-127, maximum=127):
         sld = QSlider(Qt.Horizontal, self)
-        sld.setMinimum(-127)
-        sld.setMaximum(127)
+        sld.setMinimum(minimum)
+        sld.setMaximum(maximum)
         sld.setTickInterval(position)
         sld.setFocusPolicy(Qt.NoFocus)
         # sld.setGeometry(100, 100, 100, 30)
