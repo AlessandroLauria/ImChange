@@ -1,93 +1,135 @@
 from matplotlib import numpy as np
-from matplotlib import pyplot as plt
 from PIL import Image, ImageFilter
+from scipy.fftpack import fftfreq
 import cv2
-import colorsys
 
 class Filters():
 
-    def cannyEdgeDetectorFilter(self, img):
-        # Canny Libreria
-        '''open_cv_image = cv2.fastNlMeansDenoising(open_cv_image, None, 3, 7, 21)
-        _, open_cv_image = cv2.threshold(open_cv_image, 30, 255, cv2.THRESH_TOZERO)
-
-        canny = cv2.Canny(open_cv_image, 100, 200)
-        '''
-
-        img = img.convert('L')
+    def translate(self, img, x, y):
+        img = img.convert('RGB')
         open_cv_image = np.array(img)
 
-        # 1) Applied Gaussian blur to reduce noise in the image
-        cv2.GaussianBlur(open_cv_image, (15, 15), 0)
+        red = open_cv_image[:, :, 0]
+        green = open_cv_image[:, :, 1]
+        blue = open_cv_image[:, :, 2]
 
-        # Step2: Calculating gradient magnitudes and directions
+        shift_rows, shift_cols = (x, y)
+        nr, nc = img.size[1], img.size[0]
+        Nr, Nc = fftfreq(nr), fftfreq(nc)
+        Nc, Nr = np.meshgrid(Nc, Nr)
 
-        kernel_size = 3
-        sobelx = cv2.Sobel(open_cv_image, cv2.CV_64F, 1, 0, kernel_size)
-        sobely = cv2.Sobel(open_cv_image, cv2.CV_64F, 0, 1, kernel_size)
+        fft_inputarray = np.fft.fft2(red)
+        fourier_shift = np.exp(-1j * 2 * np.pi * ((shift_rows * Nr) + (shift_cols * Nc))/200)
+        red = np.fft.ifft2(fft_inputarray * fourier_shift)
 
-        sobelx = np.uint8(np.absolute(sobelx))
-        sobely = np.uint8(np.absolute(sobely))
+        fft_inputarray = np.fft.fft2(green)
+        fourier_shift = np.exp(-1j * 2 * np.pi * ((shift_rows * Nr) + (shift_cols * Nc))/200)
+        green = np.fft.ifft2(fft_inputarray * fourier_shift)
 
-        sobelCombined = cv2.bitwise_or(sobelx, sobely)
-        #magnitudes = sqrt(sobelx** + sobely**2)
+        fft_inputarray = np.fft.fft2(blue)
+        fourier_shift = np.exp(-1j * 2 * np.pi * ((shift_rows * Nr) + (shift_cols * Nc))/200)
+        blue = np.fft.ifft2(fft_inputarray * fourier_shift)
 
+        open_cv_image[:, :, 0] = red
+        open_cv_image[:, :, 1] = green
+        open_cv_image[:, :, 2] = blue
 
-        #cv2.imshow("test", open_cv_image)
+        open_cv_image = abs(open_cv_image)
         img = Image.fromarray(open_cv_image)
-        print("canny")
         return img
+
+    def scaling(self, img, index):
+
+        print("scaling")
+
+    def statisticalRegionMerging(self, img):
+        print("srm")
+
+    def cannyEdgeDetectorFilter(self, img):
+
+        img = img.convert('L')
+        im = np.array(img, dtype=float)  # Convert to float to prevent clipping values
+
+        # 1) Applied Gaussian blur to reduce noise in the image
+        cv2.GaussianBlur(im, (15, 15), 0)
+
+        # 2) Calculate gradient magnitudes and directions
+        kernel_size = 3
+        sobelx = cv2.Sobel(im, cv2.CV_64F, 1, 0, kernel_size)
+        sobely = cv2.Sobel(im, cv2.CV_64F, 0, 1, kernel_size)
+
+        magnitude = np.sqrt(sobelx**2 + sobely**2)
+
+        angles = np.arctan2(sobely, sobelx)
+
+        # 3) Non maximum suppression
+        mag_sup = magnitude.copy()
+
+        for x in range(1, im.shape[0] - 1):
+            for y in range(1, im.shape[1] - 1):
+                if angles[x][y] == 0:
+                    if (magnitude[x][y] <= magnitude[x][y + 1]) or \
+                            (magnitude[x][y] <= magnitude[x][y - 1]):
+                        mag_sup[x][y] = 0
+                elif angles[x][y] == 45:
+                    if (magnitude[x][y] <= magnitude[x - 1][y + 1]) or \
+                            (magnitude[x][y] <= magnitude[x + 1][y - 1]):
+                        mag_sup[x][y] = 0
+                elif angles[x][y] == 90:
+                    if (magnitude[x][y] <= magnitude[x + 1][y]) or \
+                            (magnitude[x][y] <= magnitude[x - 1][y]):
+                        mag_sup[x][y] = 0
+                else:
+                    if (magnitude[x][y] <= magnitude[x + 1][y + 1]) or \
+                            (magnitude[x][y] <= magnitude[x - 1][y - 1]):
+                        mag_sup[x][y] = 0
+
+        # 4) Thresholding
+
+        m = np.max(mag_sup)
+        th = 0.2 * m
+        tl = 0.1 * m
+
+        width, height = im.shape
+
+        gnh = np.zeros((width, height))
+        gnl = np.zeros((width, height))
+
+        for x in range(width):
+            for y in range(height):
+                if mag_sup[x][y] >= th:
+                    gnh[x][y] = mag_sup[x][y]
+                if mag_sup[x][y] >= tl:
+                    gnl[x][y] = mag_sup[x][y]
+        #gnh = gnl + gnh
+
+        '''
+
+        def traverse(i, j):
+            x = [-1, 0, 1, -1, 1, -1, 0, 1]
+            y = [-1, -1, -1, 0, 0, 1, 1, 1]
+            for k in range(8):
+                if gnh[i + x[k]][j + y[k]] == 0 and gnl[i + x[k]][j + y[k]] != 0:
+                    gnh[i + x[k]][j + y[k]] = 1
+                    traverse(i + x[k], j + y[k])
+
+        for i in range(1, width - 1):
+            for j in range(1, height - 1):
+                if gnh[i][j]:
+                    gnh[i][j] = 1
+                    traverse(i, j)
+
+        '''
+
+        img = Image.fromarray(gnh)
+        img = img.convert('L')
+        return img
+
 
     def drogEdgeDetectorFilter(self, img):
 
         img = img.convert('L')
         open_cv_image = np.array(img)
-
-        '''
-        #cv2.GaussianBlur(open_cv_image, (15,15), 0)
-        open_cv_image = cv2.fastNlMeansDenoising(open_cv_image, None, 3, 7, 21)
-        _, img = cv2.threshold(open_cv_image, 30, 255, cv2.THRESH_TOZERO)
-        sobelx = cv2.Sobel(open_cv_image, cv2.CV_64F, 1, 0, ksize=3)
-        sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=3)
-
-        print('img drog:',open_cv_image[100,100])
-        drog_img = sobelx + sobely
-
-        cv2.imshow("test", drog_img)
-        img = Image.fromarray(drog_img)
-        
-        '''
-
-        '''
-        px = img.load()
-        print("######## px: ",px[100,100])
-        width, height = img.size
-        result = np.zeros((height, width, 2), dtype=np.uint8)
-
-        # Create sobel x and y matrix
-        sobel_x = np.array([[-1, 0, 1],
-                           [-2, 0, 2],
-                           [-1, 0, 1]])
-
-        sobel_y = np.array([[-1, -2, -1],
-                            [0, 0, 0],
-                            [1, 2, 1]])
-
-        kernel_dim  = 1  # 3*3
-        for i in range(kernel_dim, height - kernel_dim):
-            for j in range(kernel_dim, width - kernel_dim):
-                sum_x = 0
-                sum_y = 0
-                for n in range(0, 3):
-                    for m in range(0, 3):
-                        sum_x += px[m - 1 + j, n - 1 + i][0] * sobel_x[m, n]/4
-                        sum_y += px[m - 1 + j, n - 1 + i][0] * sobel_y[m, n]/4
-
-
-                result[i,j] = tuple([sum_x, 255])
-
-        print(result[100, 100])
-        '''
 
         width, height = img.size
 
@@ -114,22 +156,6 @@ class Filters():
         Gx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
         Gy = np.real(np.fft.ifft2(kernel2 * fim)).astype(float)
 
-        '''kernel_dim = 1  # 3*3
-        result = np.array(img)
-
-        for i in range(kernel_dim, height - kernel_dim):
-            for j in range(kernel_dim, width - kernel_dim):
-                sum_x = 0
-                sum_y = 0
-                for n in range(0, 3):
-                    for m in range(0, 3):
-                        sum_x += open_cv_image[n + j - 1, m + i - 1] * sobel_x[n, m] / 4
-                        sum_y += open_cv_image[n + j - 1, m + i - 1] * sobel_y[n, m] / 4
-
-                result[j, i] = abs(sum_x) + abs(sum_y)
-
-        open_cv_image = np.array(result)
-        '''
         open_cv_image = abs(Gx/4) + abs(Gy/4)
         img = Image.fromarray(open_cv_image)
         return img
@@ -139,7 +165,6 @@ class Filters():
         return img
 
     def geometricMeanFilter(self, img):
-        img = img.convert('RGB')
 
         '''
         px = img.load()
@@ -167,39 +192,26 @@ class Filters():
         
         '''
 
-        img = img.convert('RGB')
+        img = img.convert('L')
+
+        width, height = img.size
         open_cv_image = np.array(img)
-        red = open_cv_image[:, :, 0]
-        green = open_cv_image[:, :, 1]
-        blue = open_cv_image[:, :, 2]
 
-        width, height, _ = open_cv_image.shape
+        w = 1  # (*2+1)
 
-        mean_geometric = np.ones((9, 9))
+        for i in range(w, height - w):
+            for j in range(w, width - w):
+                block_red = open_cv_image[i - w:i + w + 1, j - w:j + w + 1]
+                m_r = np.prod(block_red, dtype=np.float32)**(1/len(block_red))
+                open_cv_image[i][j] = int(m_r)
 
-        kernel1 = np.zeros((width, height))
-        kernel1[:mean_geometric.shape[0], :mean_geometric.shape[1]] = mean_geometric
-        kernel1 = np.fft.fft2(kernel1)
-
-        im = np.array(red)
-        fim = np.fft.fft2(im)
-        Rx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
-
-        im = np.array(green)
-        fim = np.fft.fft2(im)
-        Gx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
-
-        im = np.array(blue)
-        fim = np.fft.fft2(im)
-        Bx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
-
-        open_cv_image[:, :, 0] = abs(Rx)
-        open_cv_image[:, :, 1] = abs(Gx)
-        open_cv_image[:, :, 2] = abs(Bx)
 
         img = Image.fromarray(open_cv_image)
 
         return img
+
+
+
 
     def arithmeticMeanFilter(self, img):
 
@@ -221,6 +233,8 @@ class Filters():
                         sum_blue += b
 
                 result[i, j] = tuple([sum_red / 9, sum_green / 9, sum_blue / 9])
+
+        '''
 
         '''
 
@@ -258,6 +272,37 @@ class Filters():
         img = Image.fromarray(open_cv_image)
 
         return img
+        
+        '''
+
+        img = img.convert('RGB')
+        im = np.array(img)
+        red = im[:, :, 0]
+        green = im[:, :, 1]
+        blue = im[:, :, 2]
+        w = 2
+
+        for i in range(w, im.shape[0] - w):
+            for j in range(w, im.shape[1] - w):
+                block_red = red[i - w:i + w + 1, j - w:j + w + 1]
+                m_r = np.mean(block_red, dtype=np.float32)
+                red[i][j] = int(m_r)
+
+                block_green = green[i - w:i + w + 1, j - w:j + w + 1]
+                m_g = np.mean(block_green, dtype=np.float32)
+                green[i][j] = int(m_g)
+
+                block_blue = blue[i - w:i + w + 1, j - w:j + w + 1]
+                m_r = np.mean(block_blue, dtype=np.float32)
+                blue[i][j] = int(m_r)
+
+        im[:, :, 0] = red
+        im[:, :, 1] = green
+        im[:, :, 2] = blue
+        img = Image.fromarray(im)
+        img = img.convert('RGB')
+        return img
+
 
     def saturationFilter(self, index, img):
 
@@ -275,7 +320,6 @@ class Filters():
         img = cv2.cvtColor(hsv.astype("uint8"), cv2.COLOR_HSV2RGB)
         img = Image.fromarray(img)
         return img
-
 
         '''
         img = img.convert('RGB')

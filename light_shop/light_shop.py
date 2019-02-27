@@ -27,12 +27,17 @@ class Application(QMainWindow, QWidget):
         self.contrPosition = 0
         self.satPosition = 0
 
+        self.scalePosition = 0
+        self.trasPositionX = 0
+        self.trasPositionY = 0
+
         # Check operation to apply
         self.blur_filter_pressed = ""
         self.color_filter_pressed = ""
         self.edge_filter_pressed = ""
+        self.transform_pressed = ""
 
-        # Choose if apply modification to the real image
+        # Choose if apply changing to the real image
         self.apply_arith_mean = False
         self.apply_geomet_mean = False
 
@@ -43,8 +48,12 @@ class Application(QMainWindow, QWidget):
         self.apply_canny_filter = False
         self.apply_drog_filter = False
 
+        self.apply_translation = False
+        self.apply_rotation = False
+        self.apply_scaling = False
+
         # General image variables
-        self.path = '/Users/alessandrolauria/Desktop/LightShop/light_shop/Images/image.jpg'
+        self.path = '/Users/alessandrolauria/Desktop/LightShop/light_shop/Images/minions.jpg'
         self.img = ''           # preview
         self.real_img = ''      # immagine reale
         self.test_img = ''      # immagine copia di img usata per preview operazioni
@@ -212,6 +221,36 @@ class Application(QMainWindow, QWidget):
             self.img = filters.drogEdgeDetectorFilter(self.img)
             self.showImage(self.img)
 
+    def translateX(self, index):
+        self.trasPositionX = index
+        self.translate(index, 0)
+
+    def translateY(self, index):
+        self.trasPositionY = index
+        self.translate(0, index)
+
+    def translate(self, x, y):
+
+        self.transform_pressed = "translate"
+
+        if self.apply_translation:
+            self.real_img = filters.translate(self.real_img, x, y)
+            self.showImage(self.img)
+        else:
+            self.img = filters.translate(self.img, x, y)
+            self.showImage(self.img)
+
+    def scaling(self, index):
+
+        self.transform_pressed = "scaling"
+
+        if self.apply_scaling:
+            self.real_img = filters.scaling(self.real_img, self.scalePosition)
+            self.showImage(self.img)
+        else:
+            self.img = filters.scaling(self.img, index)
+            self.showImage(self.img)
+
     # Used to load the Image in the label and set related parameters
     def importImage(self):
         print("path: ", self.path)
@@ -237,9 +276,11 @@ class Application(QMainWindow, QWidget):
         colorsAct = self.colorsButton()
         filtersAct = self.filtersButton()
         edgesAct = self.edgesButton()
-        self.statusBar().setStyleSheet("background-color: #201e1e; border: 1px #201e1e;")
+        srmAct = self. SRMButton()
+        transAct = self.transformsButton()
+        self.statusBar().setStyleSheet("background-color: #201e1e; color: #cccaca; border: 1px #201e1e;")
 
-        self.menuBar().setStyleSheet("background-color: #201e1e; border: 1px #3a3636")
+        self.menuBar().setStyleSheet("background-color: #201e1e; color: #cccaca; border: 1px #3a3636")
         menubar = self.menuBar()
         menubar.setNativeMenuBar(False)
         fileMenu = menubar.addMenu('&File')
@@ -249,17 +290,34 @@ class Application(QMainWindow, QWidget):
         fileMenu.addAction(colorsAct)
         fileMenu.addAction(filtersAct)
         fileMenu.addAction(edgesAct)
+        fileMenu.addAction(srmAct)
+        fileMenu.addAction(transAct)
 
         toolbar = self.addToolBar('Toolbar')
         toolbar.orientation()
-        toolbar.setStyleSheet("background-color: #201e1e; border: 1px #201e1e; padding: 3px;")
+        toolbar.setStyleSheet("background-color: #201e1e; color: #cccaca; border: 1px #201e1e; padding: 3px;")
         toolbar.addAction(exitAct)
         toolbar.addAction(saveAct)
         toolbar.addAction(colorsAct)
         toolbar.addAction(filtersAct)
         toolbar.addAction(edgesAct)
+        toolbar.addAction(srmAct)
+        toolbar.addAction(transAct)
 
     # Buttons showed in toolbar and menu
+    def transformsButton(self):
+        transAct = QAction(QIcon(path_to_image + 'transform.png'), 'Transformations', self)
+        transAct.setShortcut('ctrl+t')
+        transAct.setStatusTip('Translate, Rotation and Scaling')
+        transAct.triggered.connect(self.transformsBox)
+        return transAct
+
+    def SRMButton(self):
+        srmAct = QAction(QIcon(path_to_image + 'region.png'), 'SRM', self)
+        srmAct.setStatusTip('Apply Segmentation Region Merging')
+        srmAct.triggered.connect(self.statisticalRegionMerging)
+        return srmAct
+
     def edgesButton(self):
         edgesAct = QAction(QIcon(path_to_image + 'edge.png'), 'Blur Filters', self)
         edgesAct.setShortcut('ctrl+e')
@@ -282,6 +340,23 @@ class Application(QMainWindow, QWidget):
         return colorsAct
 
     # Message Box that shows operation can be done
+    def transformsBox(self):
+        trasText = QLabel("Translate", self)
+        sliderTX = self.slider(self.translateX, self.trasPositionX)
+        sliderTY = self.slider(self.translateY, self.trasPositionY)
+        scalText = QLabel("Scaling", self)
+        sliderS = self.slider(self.scaling, self.scalePosition)
+
+        widget = [trasText, sliderTX, sliderTY, scalText, sliderS]
+        result = MessageBox(widget, None)
+        result.setStandardButtons(QMessageBox.Apply | QMessageBox.Cancel)
+        result.buttonClicked.connect(self.applyTransforms)
+        result.exec_()
+
+
+    def statisticalRegionMerging(self):
+        filters.statisticalRegionMerging(self.img)
+
     def blurFilterBox(self):
         arith_mean_btn = self.button(self.arithmeticMeanFilter, "Arithmetic Blur Filter")
         geomet_mean_btn = self.button(self.geometricMeanFilter, "Geometric Blur Filter")
@@ -327,6 +402,7 @@ class Application(QMainWindow, QWidget):
     def saveDialog(self):
         print("save dialog")
         alert = QMessageBox(self)
+        alert.setStyleSheet("background-color: #423f3f; color: #cccaca;")
         alert.setText("Save")
         alert.setInformativeText("Want to save image?")
         alert.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
@@ -349,6 +425,16 @@ class Application(QMainWindow, QWidget):
                 self.apply_contr_filter = True
                 self.contrastFilter(self.contrPosition)
                 self.apply_contr_filter = False
+
+        else:
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.showImage(self.img)
+            print("Not modified")
+
+    def applyTransforms(self, btn):
+        if btn.text() == "Apply":
+            print("applied")
 
         else:
             self.img = self.real_img
@@ -396,7 +482,7 @@ class Application(QMainWindow, QWidget):
     def saveImage(self, btn):
         if btn.text() == "Save":
             print("saved")
-            self.real_img.save("test.jpeg", quality=80)
+            self.real_img.save("test.jpeg", quality=100)
 
     def exitButton(self):
         exitAct = QAction(QIcon(path_to_image + 'exit.png'), 'Exit', self)
