@@ -237,8 +237,8 @@ class Application(QMainWindow, QWidget):
             self.real_img = filters.translate(self.real_img, x, y)
             self.showImage(self.img)
         else:
-            self.img = filters.translate(self.img, x, y)
-            self.showImage(self.img)
+            self.test_img = filters.translate(self.img, x, y)
+            self.showImage(self.test_img)
 
     def scaling(self, index):
 
@@ -248,8 +248,8 @@ class Application(QMainWindow, QWidget):
             self.real_img = filters.scaling(self.real_img, self.scalePosition)
             self.showImage(self.img)
         else:
-            self.img = filters.scaling(self.img, index)
-            self.showImage(self.img)
+            self.test_img = filters.scaling(self.img, index)
+            self.showImage(self.test_img)
 
     # Used to load the Image in the label and set related parameters
     def importImage(self):
@@ -355,7 +355,8 @@ class Application(QMainWindow, QWidget):
 
 
     def statisticalRegionMerging(self):
-        filters.statisticalRegionMerging(self.img)
+        self.img = filters.statisticalRegionMerging(self.img)
+        self.showImage(self.img)
 
     def blurFilterBox(self):
         arith_mean_btn = self.button(self.arithmeticMeanFilter, "Arithmetic Blur Filter")

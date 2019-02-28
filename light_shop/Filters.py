@@ -1,9 +1,14 @@
 from matplotlib import numpy as np
 from PIL import Image, ImageFilter
 from scipy.fftpack import fftfreq
+from SRM import SRM
 import cv2
 
 class Filters():
+
+    def rotate(self, img, angle):
+
+        img.img.convert('RGB')
 
     def translate(self, img, x, y):
         img = img.convert('RGB')
@@ -13,6 +18,7 @@ class Filters():
         green = open_cv_image[:, :, 1]
         blue = open_cv_image[:, :, 2]
 
+        '''
         shift_rows, shift_cols = (x, y)
         nr, nc = img.size[1], img.size[0]
         Nr, Nc = fftfreq(nr), fftfreq(nc)
@@ -29,6 +35,15 @@ class Filters():
         fft_inputarray = np.fft.fft2(blue)
         fourier_shift = np.exp(-1j * 2 * np.pi * ((shift_rows * Nr) + (shift_cols * Nc))/200)
         blue = np.fft.ifft2(fft_inputarray * fourier_shift)
+        '''
+
+        x = -x
+        red = np.roll(red, x, axis=0)
+        red = np.roll(red, y, axis=1)
+        green = np.roll(green, x, axis=0)
+        green = np.roll(green, y, axis=1)
+        blue = np.roll(blue, x, axis=0)
+        blue = np.roll(blue, y, axis=1)
 
         open_cv_image[:, :, 0] = red
         open_cv_image[:, :, 1] = green
@@ -40,10 +55,87 @@ class Filters():
 
     def scaling(self, img, index):
 
-        print("scaling")
+        img = img.convert('RGB')
+        im = np.array(img)
+        red = im[:, :, 0]
+        green = im[:, :, 1]
+        blue = im[:, :, 2]
+
+        width, height = img.size
+
+        # Calculate the second index value to maintain the aspect ratio
+        aspect_ratio = width/height
+        index1 = index
+
+        index2 = int((index1 + width - (aspect_ratio*height))/aspect_ratio)
+
+        new_img = img.resize((width - index1, height - index2))
+        new_img = np.array(new_img)
+
+        new_red = np.zeros((height - index2, width - index1))
+        new_green = np.zeros((height - index2, width - index1))
+        new_blue = np.zeros((height - index2, width - index1))
+
+        if index > 0 :
+            new_red[:, :] = red[0: height - index2, 0:width - index1]
+            new_green[:, :] = green[0: height - index2, 0:width - index1]
+            new_blue[:, :] = blue[0: height - index2, 0:width - index1]
+        else:
+            new_red[0:height, 0:width] = red[:, :]
+            new_green[0:height, 0:width] = green[:, :]
+            new_blue[0:height, 0:width] = blue[:, :]
+
+        new_img[:, :, 0] = new_red
+        new_img[:, :, 1] = new_green
+        new_img[:, :, 2] = new_blue
+        img = Image.fromarray(new_img)
+        img = img.resize((width, height))
+
+        return img
 
     def statisticalRegionMerging(self, img):
-        print("srm")
+
+        img = img.convert('RGB')
+        image = np.array(img)
+
+        '''
+        width, height = img.size
+
+        final_image = []
+
+        for i in range(1, width - 1):
+            for j in range(1, height - 1):
+                #mean = (image[j, i] + image[j + 1, i] +image[j - 1, i] + image[j, i + 1] + image[j, i - 1]) / 5
+                mean = image[j, i]
+                for m in range(i + 1, width - 1):
+                    for n in range(j + 1, height - 1):
+
+                        if ((mean + image[n, m])/2 > mean - 50) and ((mean + image[n, m])/2 < mean + 50):
+                            mean = (mean + image[n, m])/2
+                            image[j, i] = mean
+                            image[n, m] = mean
+        
+        '''
+
+        srm = SRM(image, 400)
+        segmented = srm.run()
+        segmented = np.array(segmented).astype(int)
+
+        red = segmented[:, :, 0]
+        green = segmented[:, :, 1]
+        blue = segmented[:, :, 2]
+        #print(segmented)
+
+        image[:, :, 0] = red
+        image[:, :, 1] = green
+        image[:, :, 2] = blue
+
+        #cv2.imshow("test", segmented)
+
+        #print (segmented)
+
+        img = Image.fromarray(image)
+        return img
 
     def cannyEdgeDetectorFilter(self, img):
 
@@ -192,22 +284,32 @@ class Filters():
         
         '''
 
-        img = img.convert('L')
+        img = img.convert('RGB')
+        im = np.array(img)
+        red = im[:, :, 0]
+        green = im[:, :, 1]
+        blue = im[:, :, 2]
+        w = 2
 
-        width, height = img.size
-        open_cv_image = np.array(img)
+        for i in range(w, im.shape[0] - w):
+            for j in range(w, im.shape[1] - w):
+                block_red = red[i - w:i + w + 1, j - w:j + w + 1]
+                m_r = np.prod(block_red, dtype=np.float32)**(1/9)
+                red[i][j] = int(m_r)
 
-        w = 1  # (*2+1)
+                block_green = green[i - w:i + w + 1, j - w:j + w + 1]
+                m_g = np.prod(block_green, dtype=np.float32)**(1/9)
+                green[i][j] = int(m_g)
 
-        for i in range(w, height - w):
-            for j in range(w, width - w):
-                block_red = open_cv_image[i - w:i + w + 1, j - w:j + w + 1]
-                m_r = np.prod(block_red, dtype=np.float32)**(1/len(block_red))
-                open_cv_image[i][j] = int(m_r)
+                block_blue = blue[i - w:i + w + 1, j - w:j + w + 1]
+                m_r = np.prod(block_blue, dtype=np.float32)**(1/9)
+                blue[i][j] = int(m_r)
 
-
-        img = Image.fromarray(open_cv_image)
-
+        im[:, :, 0] = red
+        im[:, :, 1] = green
+        im[:, :, 2] = blue
+        img = Image.fromarray(im)
+        img = img.convert('RGB')
         return img
 
 
