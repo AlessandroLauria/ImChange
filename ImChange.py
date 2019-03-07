@@ -330,20 +330,21 @@ class Application(QMainWindow, QWidget):
             self.showImage(self.test_img)
 
     # Used to load the Image in the label and set related parameters
-    def importImage(self):
+    def importImage(self, drag=False):
         imp = ImportFile()
-        #print(imp.saveFileDialog())
-        self.path = imp.openFileNameDialog()
-        if self.path == "wrong path": self.path = 'Images/camera.png'
-        print("path: ", self.path)
-        #if os.path.exists(pathlib.Path(self.path)):
+
+        if not drag:
+            self.path = imp.openFileNameDialog()
+            if self.path == "wrong path": self.path = 'Images/camera.png'
+            print("path: ", self.path)
+
+
         self.real_img = Image.open(self.path)
         self.img = self.real_img
         self.resize(self.rsize)
         self.test_img = self.img
         self.showImage(self.img)
 
-        #else: print("Nothing imported")
 
     # resize dimension of the preview image
     def resize(self, width):
@@ -505,7 +506,7 @@ class Application(QMainWindow, QWidget):
         contrtext = QLabel("Contrast", self)
         sliderC = self.slider(self.contrastFilter, self.contrPosition)
         sattext = QLabel("Saturation", self)
-        sliderS = self.slider(self.saturationFilter, self.satPosition)
+        sliderS = self.slider(self.saturationFilter, self.satPosition, maximum=255, minimum=-255)
 
         widget = [lumtext, sliderL, contrtext, sliderC, sattext, sliderS]
         result = MessageBox(widget, None)
@@ -665,8 +666,8 @@ class Application(QMainWindow, QWidget):
         if urls and urls[0].scheme() == 'file':
             filepath = str(urls[0].path())[1:]
             print("filepath: ",filepath)
-            self.path = '/'+filepath
-            self.importImage()
+            self.path = filepath
+            self.importImage(drag=True)
 
 
 
@@ -678,8 +679,8 @@ class Application(QMainWindow, QWidget):
             for url in e.mimeData().urls():
                 newText += str(url.toLocalFile())
 
-            self.path = newText[0]
-            self.importImage()
+            self.path = '/'+ newText[0]
+            self.importImage(drag=True)
 
         else:
             print("file ignored")

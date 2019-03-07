@@ -20,6 +20,7 @@ class ImportFile(QWidget):
 
 
         self.setGeometry(self.left, self.top, self.width, self.height)
+        self.setStyleSheet("background-color: #423f3f; color: #b4acac;")
 
 
     def openFileNameDialog(self):
