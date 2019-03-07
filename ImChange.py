@@ -64,7 +64,7 @@ class Application(QMainWindow, QWidget):
         self.transform_check = QCheckBox("Resize window")
 
         # General image variables
-        self.path = '/Users/alessandrolauria/Desktop/LightShop/light_shop/Images/minions.jpg'
+        self.path = ''
         self.img = ''           # preview
         self.real_img = ''      # immagine reale
         self.test_img = ''      # immagine copia di img usata per preview operazioni
@@ -82,7 +82,7 @@ class Application(QMainWindow, QWidget):
 
         self.importImage()
 
-        self.setWindowTitle('LightShop')
+        self.setWindowTitle('picBloom')
 
         self.setAcceptDrops(True)
 
