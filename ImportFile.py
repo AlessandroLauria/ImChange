@@ -1,7 +1,4 @@
-import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
-from PyQt5.QtGui import QIcon
-
 
 class ImportFile(QWidget):
 
@@ -30,7 +27,7 @@ class ImportFile(QWidget):
 
 
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+        fileName, _ = QFileDialog.getOpenFileName(self, "ImChange - Import Image", "",
                                                   "Images (*.jpg *.png *.jpeg);;Python Files (*.py)", options=options)
         if fileName:
             print(fileName)
