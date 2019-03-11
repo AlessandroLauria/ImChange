@@ -4,7 +4,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PIL import Image
 from PIL.ImageQt import ImageQt
-#from matplotlib import numpy as np
 
 # My Libraries
 from Filters import Filters
