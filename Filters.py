@@ -80,26 +80,6 @@ class Filters():
 
         return img
 
-    '''
-    def rotate(self, img, angle=0):
-
-        img = img.convert('L')
-        im = np.array(img)
-
-        width, height = img.size
-
-        im_rot = np.zeros((height*2,width*2))
-
-        angle = -10
-
-        for i in range(width):
-            for j in range(height):
-                im_rot[int(j*np.cos(angle) + i*np.sin(angle)) + int(width/2), int(-j*np.sin(angle) + i*np.cos(angle)) + int(height/2)] = im[j, i]
-               # print("im_rot: [",int(j*np.cos(angle) + i*np.sin(angle)),",",int(-j*np.sin(angle) + i*np.cos(angle))," im: [",i,",",j,"]")
-
-        img = Image.fromarray(im_rot)
-        return img
-    '''
 
     def translate(self, img, x, y):
         img = img.convert('RGB')
@@ -108,25 +88,6 @@ class Filters():
         red = open_cv_image[:, :, 0]
         green = open_cv_image[:, :, 1]
         blue = open_cv_image[:, :, 2]
-
-        '''
-        shift_rows, shift_cols = (x, y)
-        nr, nc = img.size[1], img.size[0]
-        Nr, Nc = fftfreq(nr), fftfreq(nc)
-        Nc, Nr = np.meshgrid(Nc, Nr)
-
-        fft_inputarray = np.fft.fft2(red)
-        fourier_shift = np.exp(-1j * 2 * np.pi * ((shift_rows * Nr) + (shift_cols * Nc))/200)
-        red = np.fft.ifft2(fft_inputarray * fourier_shift)
-
-        fft_inputarray = np.fft.fft2(green)
-        fourier_shift = np.exp(-1j * 2 * np.pi * ((shift_rows * Nr) + (shift_cols * Nc))/200)
-        green = np.fft.ifft2(fft_inputarray * fourier_shift)
-
-        fft_inputarray = np.fft.fft2(blue)
-        fourier_shift = np.exp(-1j * 2 * np.pi * ((shift_rows * Nr) + (shift_cols * Nc))/200)
-        blue = np.fft.ifft2(fft_inputarray * fourier_shift)
-        '''
 
         x = -x
         red = np.roll(red, x, axis=0)
@@ -210,25 +171,6 @@ class Filters():
         img = img.convert('RGB')
         image = np.array(img)
 
-        '''
-        width, height = img.size
-
-        final_image = []
-
-        for i in range(1, width - 1):
-            for j in range(1, height - 1):
-                #mean = (image[j, i] + image[j + 1, i] +image[j - 1, i] + image[j, i + 1] + image[j, i - 1]) / 5
-                mean = image[j, i]
-                for m in range(i + 1, width - 1):
-                    for n in range(j + 1, height - 1):
-
-                        if ((mean + image[n, m])/2 > mean - 50) and ((mean + image[n, m])/2 < mean + 50):
-                            mean = (mean + image[n, m])/2
-                            image[j, i] = mean
-                            image[n, m] = mean
-        
-        '''
-
         srm = SRM(image, n_sample)
         segmented = srm.run()
         segmented = np.array(segmented).astype(int)
@@ -241,10 +183,6 @@ class Filters():
         image[:, :, 1] = green
         image[:, :, 2] = blue
 
-        #cv2.imshow("test", segmented)
-
-        #print (segmented)
-
         img = Image.fromarray(image)
         return img
 
@@ -252,95 +190,6 @@ class Filters():
 
         im = img.convert('L')
         img = np.array(im, dtype=float)
-        '''
-        # 1) Applied Gaussian blur to reduce noise in the image
-        cv2.GaussianBlur(im, (3, 3), 0)
-
-        # 2) Calculate gradient magnitudes and directions
-        kernel_size = 11
-        sobelx = cv2.Sobel(im, cv2.CV_64F, 1, 0, kernel_size)
-        sobely = cv2.Sobel(im, cv2.CV_64F, 0, 1, kernel_size)
-
-        magnitude = np.sqrt(sobelx**2 + sobely**2)
-
-        magnitude = (magnitude.astype('float') - magnitude.min()) / (magnitude.max() - magnitude.min())
-
-        angles = np.arctan2(sobely, sobelx)
-
-        #cv2.imshow("mag", magnitude)
-
-        # 3) Non maximum suppression
-        mag_sup = magnitude.copy()
-
-        
-        for x in range(1, im.shape[0] - 1):
-            for y in range(1, im.shape[1] - 1):
-                if angles[x][y] == 0:
-                    if (magnitude[x][y] <= magnitude[x][y + 1]) or \
-                            (magnitude[x][y] <= magnitude[x][y - 1]):
-                        mag_sup[x][y] = 0
-                elif angles[x][y] == 45:
-                    if (magnitude[x][y] <= magnitude[x - 1][y + 1]) or \
-                            (magnitude[x][y] <= magnitude[x + 1][y - 1]):
-                        mag_sup[x][y] = 0
-                elif angles[x][y] == 90:
-                    if (magnitude[x][y] <= magnitude[x + 1][y]) or \
-                            (magnitude[x][y] <= magnitude[x - 1][y]):
-                        mag_sup[x][y] = 0
-                else:
-                    if (magnitude[x][y] <= magnitude[x + 1][y + 1]) or \
-                            (magnitude[x][y] <= magnitude[x - 1][y - 1]):
-                        mag_sup[x][y] = 0
-
-        #cv2.imshow("sup", mag_sup)
-
-        # 4) Thresholding
-
-        m = np.max(mag_sup)
-        #th = 0.15 * m
-        #tl = 0.09 * m
-        th = 0.15
-        tl = 0.09
-
-        width, height = im.shape
-
-        gnh = np.zeros((width, height))
-        gnl = np.zeros((width, height))
-
-        for x in range(width):
-            for y in range(height):
-                if mag_sup[x][y] >= th:
-                    gnh[x][y] = mag_sup[x][y]
-                if mag_sup[x][y] >= tl:
-                    gnl[x][y] = mag_sup[x][y]
-        gnh = gnl + gnh
-
-        # edge linking
-
-        for x in range(width - 2):
-            for y in range(height - 2):
-                if gnl[x, y] >= 1 and ((gnh[x+1, y] >= 1) or (gnh[x, y+1] >= 1) or (gnh[x-1, y] >= 1) or (gnh[x, y-1] >= 1)\
-                                       or (gnh[x+1, y+1] >= 1) or (gnh[x+1, y-1] >= 1) or (gnh[x-1, y-1] >= 1) or (gnh[x-1, y+1] >= 1)):
-                    gnh[x, y] = gnl[x, y]
-                #else: gnh[x, y] = 0
-
-        '''
-        '''
-        def traverse(i, j):
-            x = [-1, 0, 1, -1, 1, -1, 0, 1]
-            y = [-1, -1, -1, 0, 0, 1, 1, 1]
-            for k in range(8):
-                if gnh[i + x[k]][j + y[k]] == 0 and gnl[i + x[k]][j + y[k]] != 0:
-                    gnh[i + x[k]][j + y[k]] = 1
-                    traverse(i + x[k], j + y[k])
-
-        for i in range(1, width - 1):
-            for j in range(1, height - 1):
-                if gnh[i][j]:
-                    gnh[i][j] = 1
-                    traverse(i, j)
-
-        '''
 
         # 1) Convolve gaussian kernel with gradient
         # gaussian kernel
@@ -458,13 +307,8 @@ class Filters():
                 if mag_thin[i][j] >= tHigh:
                     result_binary[i][j] = 255  # set to 255 for >= tHigh
 
-        #cv2.imshow("mag_thin", result_binary)
-
-        #img = cv2.imread('Images/minions.jpg', 0)
-        #gnh = cv2.Canny(img, img,20, 30)
 
         img = Image.fromarray(result_binary)
-        #img = img.convert('1')
         return img
 
 
@@ -598,105 +442,10 @@ class Filters():
 
         img = Image.fromarray(result)
         return img
-        
-
-
-        '''
-        img = img.convert('RGB')
-        im = np.array(img)
-        red = im[:, :, 0]
-        green = im[:, :, 1]
-        blue = im[:, :, 2]
-        w = 2
-
-        print(red)
-
-        for i in range(w, im.shape[0] - w):
-            for j in range(w, im.shape[1] - w):
-                block_red = red[i - w:i + w + 1, j - w:j + w + 1]
-                m_r = np.prod(block_red/255)
-                print(m_r)
-                red[i][j] = m_r
-
-                block_green = green[i - w:i + w + 1, j - w:j + w + 1]
-                m_g = np.prod(block_green)**(1/9)
-                green[i][j] = m_g
-
-                block_blue = blue[i - w:i + w + 1, j - w:j + w + 1]
-                m_b = np.prod(block_blue)**(1/9)
-                blue[i][j] = m_b
-
-        print(red)
-
-        im[:, :, 0] = red
-        im[:, :, 1] = green
-        im[:, :, 2] = blue
-        img = Image.fromarray(im)
-        #img = img.convert('RGB')
-        return img
-
-        '''
 
 
     def arithmeticMeanFilter(self, img):
 
-        ''' OLD IMPLEMENTATION
-        px = img.load()
-        width, height = img.size
-        result = np.zeros((height, width, 3), dtype=np.uint8)
-
-        kernel_dim = 1
-
-        for i in range(kernel_dim, height - kernel_dim + 1):
-            for j in range(kernel_dim, width - kernel_dim + 1):
-                sum_red, sum_green, sum_blue = (0, 0, 0)
-                for n in range(i - kernel_dim, i + kernel_dim):
-                    for m in range(j - kernel_dim, j + kernel_dim):
-                        r, g, b = px[m, n]
-                        sum_red += r
-                        sum_green += g
-                        sum_blue += b
-
-                result[i, j] = tuple([sum_red / 9, sum_green / 9, sum_blue / 9])
-
-        '''
-
-        '''
-        img = img.convert('RGB')
-        open_cv_image = np.array(img)
-        red = open_cv_image[:, :, 0]
-        green = open_cv_image[:, :, 1]
-        blue = open_cv_image[:, :, 2]
-
-        mean_arithmetic = np.ones((3, 3))*(1/9)
-
-        width, height, _ = open_cv_image.shape
-
-        kernel1 = np.zeros((width, height))
-        kernel1[:mean_arithmetic.shape[0], :mean_arithmetic.shape[1]] = mean_arithmetic
-        kernel1 = np.fft.fft2(kernel1)
-
-
-        im = np.array(red)
-        fim = np.fft.fft2(im)
-        Rx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
-
-        im = np.array(green)
-        fim = np.fft.fft2(im)
-        Gx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
-
-        im = np.array(blue)
-        fim = np.fft.fft2(im)
-        Bx = np.real(np.fft.ifft2(kernel1 * fim)).astype(float)
-
-        open_cv_image[:, :, 0] = abs(Rx)
-        open_cv_image[:, :, 1] = abs(Gx)
-        open_cv_image[:, :, 2] = abs(Bx)
-
-        img = Image.fromarray(open_cv_image)
-
-        return img
-        '''
         img = img.convert('RGB')
         im = np.array(img)
         red = im[:, :, 0]
@@ -743,28 +492,6 @@ class Filters():
         img = Image.fromarray(img)
         return img
 
-        '''
-        img = img.convert('RGB')
-        px = img.load()
-        width, height = img.size
-
-        result = np.zeros((height, width, 3), dtype=np.uint8)
-
-        for i in range(0, height):
-            for j in range(0, width):
-                r, g, b = px[j, i]
-
-                h, s, v = colorsys.rgb_to_hsv(r, g, b)
-                s += index/255
-                s = 0 if s <= 0 else s
-                s = 1 if s >= 1 else s
-                r, g, b = colorsys.hsv_to_rgb(h,s,v)
-                rgb = self.mantainInRange(r,g,b)
-                result[i, j] = rgb
-
-        img = Image.fromarray(result, 'RGB')
-        return img
-        '''
 
     def luminanceFilter(self, index, img):
 
@@ -783,27 +510,6 @@ class Filters():
         img = cv2.cvtColor(hsv.astype("uint8"), cv2.COLOR_HSV2RGB)
         img = Image.fromarray(img)
         return img
-
-
-        '''
-        px = img.load()
-        width, height = img.size
-
-        result = np.zeros((height, width, 3), dtype=np.uint8)
-
-        for i in range(0, height):
-            for j in range(0, width):
-                red, green, blue = px[j, i]
-                red += index
-                green += index
-                blue += index
-                rgb = self.mantainInRange(red, green, blue)
-                result[i, j] = rgb
-
-        img = Image.fromarray(result, 'RGB')
-        return img
-        
-        '''
 
 
 
@@ -842,28 +548,6 @@ class Filters():
         img = Image.fromarray(open_cv_image)
         return img
 
-        '''
-        img = img.convert('RGB')
-
-        px = img.load()
-        width, height = img.size
-
-        result = np.zeros((height, width, 3), dtype=np.uint8)
-
-        factor = (259.0 * (index + 255.0)) / (255.0 * (259.0 - index))
-
-        for i in range(0, height):
-            for j in range(0, width):
-                red, green, blue = px[j,i]
-                red = factor * (red - 128.0) + 128.0
-                green = factor * (green - 128.0) + 128.0
-                blue = factor * (blue - 128.0) + 128.0
-                rgb = self.mantainInRange(red, green, blue)
-                result[i, j] = rgb
-
-        img = Image.fromarray(result, 'RGB')
-        return img
-        '''
 
     def mantainInRange(self, red, green, blue):
         if red >= 255: red = 255

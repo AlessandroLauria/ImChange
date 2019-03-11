@@ -31,6 +31,7 @@ class Application(QMainWindow, QWidget):
         self.trasPositionX = 0
         self.trasPositionY = 0
         self.rotatePosition = 0
+        self.sigma_canny = 1
 
         # Check operation to apply
         self.blur_filter_pressed = ""
@@ -239,15 +240,19 @@ class Application(QMainWindow, QWidget):
             self.img = filters.medianFilter(self.img)
             self.showImage(self.img)
 
-    def cannyFilter(self):
+    def cannyFilter(self, sigma = 1):
 
         self.edge_filter_pressed = "canny"
+        self.sigma_canny = sigma
+
+        self.img = self.real_img
+        self.resize(self.rsize)
 
         if self.apply_canny_filter:
-            self.real_img = filters.cannyEdgeDetectorFilter(self.real_img)
+            self.real_img = filters.cannyEdgeDetectorFilter(self.real_img, sigma)
             self.showImage(self.img)
         else:
-            self.img = filters.cannyEdgeDetectorFilter(self.img)
+            self.img = filters.cannyEdgeDetectorFilter(self.img, sigma)
             self.showImage(self.img)
 
     def drogFilter(self):
@@ -469,9 +474,12 @@ class Application(QMainWindow, QWidget):
         result.exec_()
 
     def cannyFilterBox(self):
+        canny_text = QLabel("Sigma Canny", self)
+        #sig = QLabel(str(self.sigma_canny), self)
         canny_btn = self.button(self.cannyFilter, "Canny")
         drog_btn = self.button(self.drogFilter, "Drog")
-        widget = [canny_btn, drog_btn]
+        sigma_slider = self.slider(self.cannyFilter, self.sigma_canny, minimum=1,maximum=10)
+        widget = [canny_text, sigma_slider, canny_btn, drog_btn]
         result = MessageBox(widget, None)
         result.setDefaultButton(QMessageBox.Apply)
         result.setStandardButtons(QMessageBox.Apply | QMessageBox.Cancel)
