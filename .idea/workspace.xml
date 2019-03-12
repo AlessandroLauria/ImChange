@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ef830616-1079-42d3-8237-3e89e9238c20" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Filters.py" beforeDir="false" afterPath="$PROJECT_DIR$/Filters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/picBloom.py" beforeDir="false" afterPath="$PROJECT_DIR$/picBloom.py" afterDir="false" />
-    </list>
+    <list default="true" id="ef830616-1079-42d3-8237-3e89e9238c20" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,7 +10,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/picBloom.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="295">
@@ -26,11 +22,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Filters.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="188" column="13" selection-start-line="188" selection-start-column="8" selection-end-line="188" selection-end-column="13" />
+            <state relative-caret-position="2055">
+              <caret line="311" column="18" lean-forward="true" selection-start-line="193" selection-start-column="7" selection-end-line="311" selection-end-column="18" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
               </folding>
@@ -82,8 +78,8 @@
       <find>import</find>
       <find>light</find>
       <find>ImCh</find>
-      <find>canny</find>
       <find>canny_</find>
+      <find>canny</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -218,22 +214,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Filters.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="188" column="13" selection-start-line="188" selection-start-column="8" selection-end-line="188" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#34#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/picBloom.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="295">
           <caret line="481" column="29" selection-start-line="481" selection-start-column="29" selection-end-line="481" selection-end-column="29" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Filters.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2055">
+          <caret line="311" column="18" lean-forward="true" selection-start-line="193" selection-start-column="7" selection-end-line="311" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
           </folding>
         </state>
       </provider>
