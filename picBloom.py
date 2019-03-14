@@ -1,4 +1,4 @@
-import sys, os, pathlib
+import sys, pathlib
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -6,6 +6,7 @@ from PIL import Image
 from PIL.ImageQt import ImageQt
 
 # My Libraries
+
 from Filters import Filters
 from MessageBox import MessageBox
 from ImportFile import ImportFile
@@ -80,7 +81,7 @@ class Application(QMainWindow, QWidget):
 
     def initUI(self):
 
-        self.importImage()
+        #self.importImage()
 
         self.setWindowTitle('picBloom')
 

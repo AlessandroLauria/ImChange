@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-import sys
+
 
 class MessageBox(QMessageBox):
     def __init__(self, s, *args, **kwargs):

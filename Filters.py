@@ -1,10 +1,8 @@
 from matplotlib import numpy as np
 from PIL import Image, ImageFilter
-from scipy.fftpack import fftfreq
 from SRM import SRM
-import imutils
+#import imutils
 import cv2
-from scipy import signal
 
 class Filters():
 
