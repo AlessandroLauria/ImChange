@@ -49,11 +49,25 @@ The software is splitted in many files. The task of any is described below:
 - MessageBox.py:
    Probabily it not need to be modified. It open a message box that allow the user to use the filters selected.
 - SRM.py:
-   The implementation of Statistical Region merging. This use UnionFind.py
+   The implementation of Statistical Region merging. This use UnionFind.py.
 - UnionFind.py:
-   
+   Implementation of Union Find.
+- ImportFile.py
+   Make the import window to allow the user to choose the image.
   
 All images used by the application are placed in the 'Images' folder.
+
+# Make the Bundle (OsX,Windows,Linux)
+
+I used pyinstaller to make the executable. It is a cross-platform software the provide an auto detection of dependecy and make the bundled app.
+
+In the picBloom.spec file are defined the basic parameters for the export.
+
+Use this command to make the bundle:
+- pyinstaller picBloom.spec --windowed
+
+## Bug on OsX version of pyinstaller
+On OsX I find a bug of pyinstaller that make a wrong import of cv2 and imutils imports. To make the working app is necessary press right button on .app file and click on 'Show Content'. After that go into Contents/MacOs/ and paste them the libraries.
 
 # Future Developements
 
