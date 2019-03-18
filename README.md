@@ -29,7 +29,7 @@ After that, place the .app in your Application folder and double click on it
 # Installation on Linux
 
 # To contribute
-Clone the repository and work in the version for your OS. 
+Clone the repository and work in your OS version. 
 
 To run the code you have to lunch the following command, by command line:
 - python picBloom.py
@@ -66,7 +66,7 @@ In the picBloom.spec file are defined the basic parameters for the export.
 Use this command to make the bundle:
 - pyinstaller picBloom.spec --windowed
 
-## Bug on OsX version of pyinstaller
+### Bug on OsX version of pyinstaller
 On OsX I find a bug of pyinstaller that make a wrong import of cv2 and imutils imports. To make the working app is necessary press right button on .app file and click on 'Show Content'. After that go into Contents/MacOs/ and paste them the libraries.
 
 # Future Developements
