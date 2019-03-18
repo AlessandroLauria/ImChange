@@ -48,6 +48,10 @@ The software is splitted in many files. The task of any is described below:
    A library that implements all filters used by the application. If you want to add one new filter you need to update this file and use the new filter in picBloom.py following the "work flow" for the user interface.
 - MessageBox.py:
    Probabily it not need to be modified. It open a message box that allow the user to use the filters selected.
+- SRM.py:
+   The implementation of Statistical Region merging. This use UnionFind.py
+- UnionFind.py:
+   
   
 All images used by the application are placed in the 'Images' folder.
 
@@ -56,4 +60,5 @@ All images used by the application are placed in the 'Images' folder.
 - The application need of course an implementation of more filters. 
 - Some bugs have to be fixed. 
 - The SRM algorithm need an improvement.
+- Graphic adaptation for different OS
 
