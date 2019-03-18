@@ -1,7 +1,7 @@
 from matplotlib import numpy as np
 from PIL import Image, ImageFilter
 from SRM import SRM
-#import imutils
+import imutils
 import cv2
 
 class Filters():

@@ -5,6 +5,8 @@ from PyQt5.QtCore import *
 from PIL import Image
 from PIL.ImageQt import ImageQt
 
+sys.setrecursionlimit(5000)
+
 # My Libraries
 
 from Filters import Filters
@@ -14,7 +16,7 @@ from ImportFile import ImportFile
 # Global class that calls filter methods
 filters = Filters()
 
-path_to_image = "Images/"
+path_to_image = "./Images"
 
 
 class Application(QMainWindow, QWidget):

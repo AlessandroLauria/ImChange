@@ -4,8 +4,6 @@
     <list default="true" id="ef830616-1079-42d3-8237-3e89e9238c20" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Filters.py" beforeDir="false" afterPath="$PROJECT_DIR$/Filters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Images/icon.icns" beforeDir="false" afterPath="$PROJECT_DIR$/Images/icon.icns" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MessageBox.py" beforeDir="false" afterPath="$PROJECT_DIR$/MessageBox.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/picBloom.py" beforeDir="false" afterPath="$PROJECT_DIR$/picBloom.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,20 +14,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/picBloom.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" selection-start-line="9" selection-end-line="9" />
+            <state relative-caret-position="187">
+              <caret line="245" column="13" selection-start-line="245" selection-start-column="8" selection-end-line="245" selection-end-column="13" />
+              <folding>
+                <element signature="e#0#19#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Filters.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="36">
-              <caret line="3" column="1" lean-forward="true" selection-start-line="3" selection-start-column="1" selection-end-line="3" selection-end-column="1" />
+            <state relative-caret-position="60">
+              <caret line="4" selection-start-line="4" selection-end-line="4" />
             </state>
           </provider>
         </entry>
@@ -46,7 +47,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MessageBox.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
+            <state relative-caret-position="210">
               <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
@@ -78,9 +79,10 @@
       <find>import</find>
       <find>light</find>
       <find>ImCh</find>
-      <find>canny</find>
       <find>imutils</find>
       <find>canny_</find>
+      <find>path_to_image</find>
+      <find>canny</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -93,13 +95,13 @@
         <option value="$PROJECT_DIR$/ImportFile.py" />
         <option value="$PROJECT_DIR$/ImChange.py" />
         <option value="$PROJECT_DIR$/MessageBox.py" />
-        <option value="$PROJECT_DIR$/picBloom.py" />
         <option value="$PROJECT_DIR$/Filters.py" />
+        <option value="$PROJECT_DIR$/picBloom.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="y" value="203" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="827" />
   </component>
@@ -108,7 +110,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -120,6 +121,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -159,7 +161,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="203" width="1440" height="827" extended-state="0" />
+    <frame x="0" y="23" width="1440" height="827" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15574348" />
@@ -187,6 +189,16 @@
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/ImChange.py" />
+    <entry file="file://$PROJECT_DIR$/MessageBox.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/SRM.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -199,13 +211,10 @@
     <entry file="file://$PROJECT_DIR$/UnionFind.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/MessageBox.py">
+    <entry file="file://$PROJECT_DIR$/Filters.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="60">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
         </state>
       </provider>
     </entry>
@@ -218,15 +227,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/picBloom.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" selection-start-line="9" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Filters.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="3" column="1" lean-forward="true" selection-start-line="3" selection-start-column="1" selection-end-line="3" selection-end-column="1" />
+        <state relative-caret-position="187">
+          <caret line="245" column="13" selection-start-line="245" selection-start-column="8" selection-end-line="245" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
