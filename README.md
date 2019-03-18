@@ -43,8 +43,17 @@ If everything go right the main window will open, if not, install the dependecy 
 # Software structure
 The software is splitted in many files. The task of any is described below:
 - picBloom.py:
-  This is the main window that handle the grafic intefarce of the application. Lauch this file with python (or python3) to start the application.
+   This is the main window that handle the grafic intefarce of the application. Lauch this file with python (or python3) to start the application.
 - Filters.py:
-  A library that implements all filters used by the application. If you want to add one new filter you need to update this file and use the new filter in picBloom.py following the "work flow" for the user interface.
+   A library that implements all filters used by the application. If you want to add one new filter you need to update this file and use the new filter in picBloom.py following the "work flow" for the user interface.
 - MessageBox.py:
-  Probabily it not need to be modified. It open a message box that allow the user to use the filters selected.
+   Probabily it not need to be modified. It open a message box that allow the user to use the filters selected.
+  
+All images used by the application are placed in the 'Images' folder.
+
+# Future Developements
+
+- The application need of course an implementation of more filters. 
+- Some bugs have to be fixed. 
+- The SRM algorithm need an improvement.
+
