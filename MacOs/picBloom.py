@@ -675,6 +675,7 @@ class Application(QMainWindow, QWidget):
         exitAct.triggered.connect(self.close)
         return exitAct
 
+    '''
     def dragEnterEvent(self, e):
         e.accept()
 
@@ -706,7 +707,7 @@ class Application(QMainWindow, QWidget):
             e.ignore()
 
         self.showImage(self.img)
-
+    '''
 
 
 if __name__ == '__main__':
