@@ -1,4 +1,4 @@
-import sys, pathlib
+import sys, pathlib, os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -16,8 +16,17 @@ from ImportFile import ImportFile
 # Global class that calls filter methods
 filters = Filters()
 
-path_to_image = "./Images"
+path_to_image = "Images/"
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 class Application(QMainWindow, QWidget):
 
@@ -76,7 +85,7 @@ class Application(QMainWindow, QWidget):
         self.lbl = QLabel(self)
 
         self.setGeometry(100, 100, 800, 600)
-        self.setWindowIcon(QIcon(path_to_image + 'icon.png'))
+        self.setWindowIcon(QIcon(resource_path(path_to_image + 'icon.png')))
         # self.showFullScreen()
         self.setStyleSheet("background-color: #423f3f; QText{color: #b4acac}")
         self.initUI()
@@ -398,40 +407,40 @@ class Application(QMainWindow, QWidget):
 
     # Buttons showed in toolbar and menu
     def importButton(self):
-        importAct = QAction(QIcon(path_to_image + 'import.png'), 'Import image', self)
+        importAct = QAction(QIcon(resource_path(path_to_image + 'import.png')), 'Import image', self)
         importAct.setShortcut('ctrl+i')
         importAct.triggered.connect(self.importImage)
         return importAct
 
     def transformsButton(self):
-        transAct = QAction(QIcon(path_to_image + 'transform.png'), 'Transformations', self)
+        transAct = QAction(QIcon(resource_path(path_to_image + 'transform.png')), 'Transformations', self)
         transAct.setShortcut('ctrl+t')
         transAct.setStatusTip('Translate, Rotation and Scaling')
         transAct.triggered.connect(self.transformsBox)
         return transAct
 
     def SRMButton(self):
-        srmAct = QAction(QIcon(path_to_image + 'region.png'), 'SRM', self)
+        srmAct = QAction(QIcon(resource_path(path_to_image + 'region.png')), 'SRM', self)
         srmAct.setStatusTip('Apply Segmentation Region Merging')
         srmAct.triggered.connect(self.SRMBox)
         return srmAct
 
     def edgesButton(self):
-        edgesAct = QAction(QIcon(path_to_image + 'edge.png'), 'Blur Filters', self)
+        edgesAct = QAction(QIcon(resource_path(path_to_image + 'edge.png')), 'Blur Filters', self)
         edgesAct.setShortcut('ctrl+e')
         edgesAct.setStatusTip('Apply Edge Detection Filter')
         edgesAct.triggered.connect(self.cannyFilterBox)
         return edgesAct
 
     def filtersButton(self):
-        filterAct = QAction(QIcon(path_to_image + 'blur.png'), 'Blur Filters', self)
+        filterAct = QAction(QIcon(resource_path(path_to_image + 'blur.png')), 'Blur Filters', self)
         filterAct.setShortcut('ctrl+f')
         filterAct.setStatusTip('Apply Blur Filters')
         filterAct.triggered.connect(self.blurFilterBox)
         return filterAct
 
     def colorsButton(self):
-        colorsAct = QAction(QIcon(path_to_image + 'sliders.png'), 'Color change', self)
+        colorsAct = QAction(QIcon(resource_path(path_to_image + 'sliders.png')), 'Color change', self)
         colorsAct.setShortcut('ctrl+c')
         colorsAct.setStatusTip('Change Luminance, Contrast or Saturation')
         colorsAct.triggered.connect(self.colorBox)
@@ -525,7 +534,7 @@ class Application(QMainWindow, QWidget):
         result.exec_()
 
     def saveButton(self):
-        saveAct = QAction(QIcon(path_to_image + 'save.png'), 'Save', self)
+        saveAct = QAction(QIcon(resource_path(path_to_image + 'save.png')), 'Save', self)
         saveAct.setShortcut('ctrl+s')
         saveAct.setStatusTip('Save Image')
         saveAct.triggered.connect(self.saveDialog)
@@ -660,7 +669,7 @@ class Application(QMainWindow, QWidget):
             self.real_img.save("test.jpeg", quality=100)
 
     def exitButton(self):
-        exitAct = QAction(QIcon(path_to_image + 'exit.png'), 'Exit', self)
+        exitAct = QAction(QIcon(resource_path(path_to_image + 'exit.png')), 'Exit', self)
         exitAct.setShortcut('ctrl+q')
         exitAct.setStatusTip('Exit application')
         exitAct.triggered.connect(self.close)
