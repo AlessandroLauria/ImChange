@@ -18,6 +18,8 @@ filters = Filters()
 
 path_to_image = "Images/"
 
+# This function calculate the path where to find icons
+# after pyinstaller export
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
@@ -78,9 +80,9 @@ class Application(QMainWindow, QWidget):
         # General image variables
         self.path = ''
         self.img = ''           # preview
-        self.real_img = ''      # immagine reale
-        self.test_img = ''      # immagine copia di img usata per preview operazioni
-        self.rsize = 400        # dimesione preview
+        self.real_img = ''      # image with real size
+        self.test_img = ''      # image used to test filters
+        self.rsize = 400        # preview dimension
 
         self.lbl = QLabel(self)
 
@@ -141,14 +143,25 @@ class Application(QMainWindow, QWidget):
         sld.valueChanged[int].connect(function)
         return sld
 
+    # Make a button with text passed as parameter
+    # and call a specific funtion when pressed
     def button(self,function, text):
         btn = QPushButton(text, self)
         btn.clicked.connect(function)
         return btn
 
+    # Filters section:
+    # Filters follow this work flow -
+    # if "apply" variable of the filter is True, apply the filter
+    # on real image that is not showed. Else use the test image
+    # to show the result of the application as preview
+    #
+    # A variable 'Pressed' records the last filter applied
+    #
+    # All filters are applied using 'filters' library
+
     # Saturation filter
     def saturationFilter(self, index):
-
         if self.color_filter_pressed != "sat":
             self.img = self.test_img
 
@@ -351,7 +364,7 @@ class Application(QMainWindow, QWidget):
 
         if not drag:
             self.path = imp.openFileNameDialog()
-            if self.path == "wrong path": self.path = 'Images/camera.png'
+            if self.path == "wrong path": self.path = resource_path('Images/camera.png')
             print("path: ", self.path)
 
 
