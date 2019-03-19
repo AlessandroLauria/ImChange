@@ -33,7 +33,7 @@ To install the final application on Linux dist you have to download the .sh file
 http://picbloom.altervista.org/home/index.html#about
 
 # To contribute
-Clone the repository and work in your OS. 
+Clone the repository and work in your OS folder. 
 
 To run the code you have to lunch the following command, by command line:
 - python picBloom.py
@@ -71,13 +71,13 @@ Use this command to make the bundle:
 - pyinstaller picBloom.spec --windowed
 
 ### Bug on OsX version of pyinstaller
-Using OsX I found a bug of pyinstaller that make a wrong import of cv2 and imutils libraries. To make it work is necessary press right button on .app file and click on 'Show Contents'. After that go into Contents/MacOs/ and paste them the libraries folders.
+Using OsX I found a bug of pyinstaller that make a wrong import of cv2 and imutils libraries. To make it work is necessary press right button on .app file and click on 'Show Contents'. After that go into Contents/MacOs/ and then paste there the libraries folders.
 
 # Future Developements
 
-- The application need of course an implementation of more filters. 
+- The application need of course of an implementation of more filters. 
 - Some bugs have to be fixed. 
 - The SRM algorithm need an improvement.
 - Graphic adaptation for different OS
-- Drag and Drop 
+- Drag and Drop system
 
