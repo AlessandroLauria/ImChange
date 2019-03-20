@@ -685,6 +685,18 @@ class Application(QMainWindow, QWidget):
                 return
             else:
                 print("saved")
+
+                tmp = path.split('/')
+                tmp = tmp[-1]
+                print(tmp);
+                extension = tmp.split('.')
+
+                if len(extension) < 2:
+                    self.real_img.save(path+'.png', quality=100)
+                    return
+                if extension[len(extension)-1]!='png' and extension[len(extension)-1]!='jpg' and extension[len(extension)-1]!='jpeg':
+                    return
+
                 self.real_img.save(path, quality=100)
 
     def exitButton(self):
