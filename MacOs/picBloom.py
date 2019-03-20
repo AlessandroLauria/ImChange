@@ -4,11 +4,13 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PIL import Image
 from PIL.ImageQt import ImageQt
+import urllib.request
+import numpy as np
+import webbrowser
 
 sys.setrecursionlimit(5000)
 
 # My Libraries
-
 from Filters import Filters
 from MessageBox import MessageBox
 from ImportFile import ImportFile
@@ -29,6 +31,9 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
+
+# Current app version
+version = "1.0.0"
 
 class Application(QMainWindow, QWidget):
 
@@ -94,6 +99,7 @@ class Application(QMainWindow, QWidget):
 
     def initUI(self):
 
+        self.checkUpdate()
         self.importImage(background=True)
 
         self.setWindowTitle('picBloom')
@@ -103,6 +109,35 @@ class Application(QMainWindow, QWidget):
         self.menu()
         self.show()
 
+    # funtion that check if exist a new version of the application
+    def checkUpdate(self):
+        try:
+            last_version = urllib.request.urlopen("http://picbloom.altervista.org/version/version.php").read()
+            last_version = np.array(last_version).astype('str')
+            #last_version = last_version[1:]
+
+            print("last version: ",last_version)
+            print("current version: ", version)
+
+            if last_version:
+                if version!=last_version:
+                    print("Update sfotware")
+                    alert = QMessageBox(self)
+                    #alert.setStyleSheet("background-color: #423f3f; color: #cccaca;")
+                    alert.setText("New Version")
+                    alert.setInformativeText("There is a new picBloom's version, do you want to download?")
+                    alert.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+                    alert.show()
+                    alert.buttonClicked.connect(self.updateSoftware)
+        except:
+            print("Error query")
+
+
+    def updateSoftware(self, btn):
+        if btn.text() == "Save":
+            url = "http://picbloom.altervista.org/download/picBloom-macOs.zip"
+            webbrowser.open_new_tab(url)
+            #urllib.request.urlopen("http://picbloom.altervista.org/download/picBloom-macOs.zip").read()
 
     # Used to show on the label the image passed as parameter
     def showImage(self, img):
