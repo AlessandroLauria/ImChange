@@ -94,7 +94,7 @@ class Application(QMainWindow, QWidget):
 
     def initUI(self):
 
-        #self.importImage()
+        self.importImage(background=True)
 
         self.setWindowTitle('picBloom')
 
@@ -265,7 +265,7 @@ class Application(QMainWindow, QWidget):
             self.img = filters.medianFilter(self.img)
             self.showImage(self.img)
 
-    def cannyFilter(self, sigma = 1):
+    def cannyFilter(self, sigma = 2):
 
         self.edge_filter_pressed = "canny"
         self.sigma_canny = sigma
@@ -359,10 +359,12 @@ class Application(QMainWindow, QWidget):
             self.showImage(self.test_img)
 
     # Used to load the Image in the label and set related parameters
-    def importImage(self, drag=False):
+    def importImage(self, drag=False, background=False):
         imp = ImportFile()
 
-        if not drag:
+        if background:
+            self.path = resource_path('Images/camera.png')
+        elif not drag:
             self.path = imp.openFileNameDialog()
             if self.path == "wrong path": self.path = resource_path('Images/camera.png')
             print("path: ", self.path)
@@ -501,10 +503,10 @@ class Application(QMainWindow, QWidget):
     def cannyFilterBox(self):
         canny_text = QLabel("Sigma Canny", self)
         #sig = QLabel(str(self.sigma_canny), self)
-        canny_btn = self.button(self.cannyFilter, "Canny")
+        #canny_btn = self.button(self.cannyFilter, "Canny")
         drog_btn = self.button(self.drogFilter, "Drog")
         sigma_slider = self.slider(self.cannyFilter, self.sigma_canny, minimum=1,maximum=10)
-        widget = [canny_text, sigma_slider, canny_btn, drog_btn]
+        widget = [canny_text, sigma_slider, drog_btn]
         result = MessageBox(widget, None)
         result.setDefaultButton(QMessageBox.Apply)
         result.setStandardButtons(QMessageBox.Apply | QMessageBox.Cancel)
@@ -677,9 +679,13 @@ class Application(QMainWindow, QWidget):
 
 
     def saveImage(self, btn):
+        path = ImportFile.saveFileDialog(self);
         if btn.text() == "Save":
-            print("saved")
-            self.real_img.save("test.jpeg", quality=100)
+            if(path == "wrong path"):
+                return
+            else:
+                print("saved")
+                self.real_img.save(path, quality=100)
 
     def exitButton(self):
         exitAct = QAction(QIcon(resource_path(path_to_image + 'exit.png')), 'Exit', self)

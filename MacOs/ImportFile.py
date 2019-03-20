@@ -42,9 +42,9 @@ class ImportFile(QWidget):
 
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()", "",
-                                                  "All Files (*);;Text Files (*.txt)", options=options)
+                                                  "Images (*.jpg *.png *.jpeg)", options=options)
         if fileName:
             print(fileName)
             return fileName
 
-        return "path sbagliato"
+        return "wrong path"
