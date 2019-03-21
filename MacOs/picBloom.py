@@ -33,7 +33,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 # Current app version
-version = "1.0.0"
+version = "1.0.1"
 
 class Application(QMainWindow, QWidget):
 
@@ -109,7 +109,7 @@ class Application(QMainWindow, QWidget):
         self.menu()
         self.show()
 
-    # funtion that check if exist a new version of the application
+    # funtion that check if exist a new picbloom version
     def checkUpdate(self):
         try:
             last_version = urllib.request.urlopen("http://picbloom.altervista.org/version/version.php").read()
@@ -121,23 +121,25 @@ class Application(QMainWindow, QWidget):
 
             if last_version:
                 if version!=last_version:
-                    print("Update sfotware")
+                    print("Update software")
                     alert = QMessageBox(self)
-                    #alert.setStyleSheet("background-color: #423f3f; color: #cccaca;")
+                    alert.setIcon(QMessageBox.Question)
+                    alert.setStyleSheet("background-color: white; color: black; width:200;")
                     alert.setText("New Version")
-                    alert.setInformativeText("There is a new picBloom's version, do you want to download?")
-                    alert.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+                    alert.setInformativeText("There is a new picBloom version, do you want to download?")
+                    alert.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
                     alert.show()
-                    alert.buttonClicked.connect(self.updateSoftware)
+                    reply = alert.exec_()
+                    if reply == QMessageBox.Yes:
+                        print('download')
+                        url = "http://picbloom.altervista.org/home/index.html"
+                        webbrowser.open_new_tab(url)
+                        # urllib.request.urlopen("http://picbloom.altervista.org/download/picBloom-macOs.zip").read()
+
         except:
             print("Error query")
 
 
-    def updateSoftware(self, btn):
-        if btn.text() == "Save":
-            url = "http://picbloom.altervista.org/download/picBloom-macOs.zip"
-            webbrowser.open_new_tab(url)
-            #urllib.request.urlopen("http://picbloom.altervista.org/download/picBloom-macOs.zip").read()
 
     # Used to show on the label the image passed as parameter
     def showImage(self, img):
