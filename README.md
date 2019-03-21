@@ -1,4 +1,4 @@
-# picBloom v0.1.0
+# picBloom v1.0.1
 picBloom is a cross-platform desktop app focused on the image processing. It implements operations described below:
 - Color Change:
   - Brightness
