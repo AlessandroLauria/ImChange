@@ -63,11 +63,12 @@ All images (like icons) used by the application are placed in the 'Images' folde
 
 # Make the Bundle (OsX,Windows,Linux)
 
-I used pyinstaller to make the executable. It is a cross-platform software the provide an auto detection of dependecy and make the bundled app.
+I used pyinstaller to make the executable. It is a cross-platform software that provide an auto detection of dependecy and make the bundled app.
 
 In the picBloom.spec file are defined the basic parameters for the export.
 
 Use this command to make the bundle:
+- pip install pyinstaller (only one time to install pyinstaller)
 - pyinstaller picBloom.spec --windowed
 
 ### Bug on OsX version of pyinstaller
