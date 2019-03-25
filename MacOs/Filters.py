@@ -359,6 +359,8 @@ class Filters():
 
         img = img.convert('RGB')
         im = np.array(img)
+
+        ''' SLOW OLD IMPLEMENTATION
         red = im[:, :, 0]
         green = im[:, :, 1]
         blue = im[:, :, 2]
@@ -381,6 +383,8 @@ class Filters():
         im[:, :, 0] = red
         im[:, :, 1] = green
         im[:, :, 2] = blue
+        '''
+        im = cv2.medianBlur(im, 11)
         img = Image.fromarray(im)
         img = img.convert('RGB')
         return img
@@ -447,6 +451,8 @@ class Filters():
 
         img = img.convert('RGB')
         im = np.array(img)
+
+        ''' SLOW OLD IMPLEMENTATION
         red = im[:, :, 0]
         green = im[:, :, 1]
         blue = im[:, :, 2]
@@ -469,6 +475,11 @@ class Filters():
         im[:, :, 0] = red
         im[:, :, 1] = green
         im[:, :, 2] = blue
+        '''
+
+        kernel = np.ones((11, 11), np.float32) / 121
+        im = cv2.filter2D(im, -1, kernel)
+
         img = Image.fromarray(im)
         img = img.convert('RGB')
         return img

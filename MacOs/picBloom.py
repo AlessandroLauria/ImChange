@@ -36,6 +36,9 @@ def resource_path(relative_path):
 # Current app version
 version = "1.0.1"
 
+# Debug variable to enable/disable some functionality
+debug = True
+
 class Application(QMainWindow, QWidget):
 
 
@@ -106,7 +109,7 @@ class Application(QMainWindow, QWidget):
     def initUI(self):
 
         self.checkUpdate()
-        self.idApp()
+        if not debug: self.idApp()
         self.importImage(background=True)
 
         self.setWindowTitle('picBloom')
@@ -120,14 +123,19 @@ class Application(QMainWindow, QWidget):
     # else open the file and read the id
     def idApp(self):
         try:
-            id_app = open('id_app', 'r+')
+            id_app = open(sys._MEIPASS +'id_app', 'r+')
             self.id = id_app.read()
+            urllib.request.urlopen("http://picbloom.altervista.org/home/user_actions.php?id_app="+self.id+"&action=open")
 
         except:
-            id_app = open('id_app', 'w+')
+            id_app = open(sys._MEIPASS +'id_app', 'w+')
             id_rand = random.randint(0,100000000)
             id_app.write(str(id_rand))
             self.id = id_rand
+            try:
+                urllib.request.urlopen("http://picbloom.altervista.org/home/user_actions.php?id_app="+self.id+"&action=new")
+            except:
+                print("request new failed")
 
         print("id: ", self.id)
         id_app.close()

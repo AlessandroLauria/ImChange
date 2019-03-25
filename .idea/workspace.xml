@@ -14,11 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MacOs/picBloom.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-9420">
-              <caret line="221" column="58" lean-forward="true" selection-start-line="221" selection-start-column="58" selection-end-line="221" selection-end-column="58" />
+            <state relative-caret-position="-807">
+              <caret line="373" column="35" lean-forward="true" selection-start-line="373" selection-start-column="35" selection-end-line="373" selection-end-column="35" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -26,11 +26,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MacOs/Filters.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="242">
-              <caret line="309" column="30" selection-start-line="309" selection-start-column="30" selection-end-line="309" selection-end-column="30" />
+            <state relative-caret-position="-170">
+              <caret line="479" column="52" selection-start-line="479" selection-start-column="52" selection-end-line="479" selection-end-column="52" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
               </folding>
@@ -60,7 +60,6 @@
       <find>import</find>
       <find>importImag</find>
       <find>canny</find>
-      <find>can</find>
       <find>showImage</find>
       <find>importImage</find>
       <find>apply</find>
@@ -69,6 +68,9 @@
       <find>geome</find>
       <find>self.blur_filter_pressed</find>
       <find>apply_geomet_mean</find>
+      <find>close</find>
+      <find>can</find>
+      <find>median</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -84,13 +86,13 @@
         <option value="$PROJECT_DIR$/Filters.py" />
         <option value="$PROJECT_DIR$/picBloom.py" />
         <option value="$PROJECT_DIR$/MacOs/ImportFile.py" />
-        <option value="$PROJECT_DIR$/MacOs/Filters.py" />
         <option value="$PROJECT_DIR$/MacOs/picBloom.py" />
+        <option value="$PROJECT_DIR$/MacOs/Filters.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="y" value="203" />
+  <component name="ProjectFrameBounds">
+    <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="827" />
   </component>
@@ -155,7 +157,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="827" extended-state="6" />
+    <frame x="0" y="23" width="1440" height="827" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15574348" />
@@ -196,22 +198,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MacOs/Filters.py">
+    <entry file="file://$PROJECT_DIR$/MacOs/picBloom.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="309" column="30" selection-start-line="309" selection-start-column="30" selection-end-line="309" selection-end-column="30" />
+        <state relative-caret-position="-807">
+          <caret line="373" column="35" lean-forward="true" selection-start-line="373" selection-start-column="35" selection-end-line="373" selection-end-column="35" />
           <folding>
-            <element signature="e#0#34#0" expanded="true" />
+            <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MacOs/picBloom.py">
+    <entry file="file://$PROJECT_DIR$/MacOs/Filters.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-9420">
-          <caret line="221" column="58" lean-forward="true" selection-start-line="221" selection-start-column="58" selection-end-line="221" selection-end-column="58" />
+        <state relative-caret-position="-170">
+          <caret line="479" column="52" selection-start-line="479" selection-start-column="52" selection-end-line="479" selection-end-column="52" />
           <folding>
-            <element signature="e#0#23#0" expanded="true" />
+            <element signature="e#0#34#0" expanded="true" />
           </folding>
         </state>
       </provider>
