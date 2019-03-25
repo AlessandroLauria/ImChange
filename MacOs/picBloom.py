@@ -7,6 +7,7 @@ from PIL.ImageQt import ImageQt
 import urllib.request
 import numpy as np
 import webbrowser
+import random
 
 sys.setrecursionlimit(5000)
 
@@ -40,6 +41,8 @@ class Application(QMainWindow, QWidget):
 
     def __init__(self):
         super().__init__()
+
+        self.id = ""
 
         # Filters Variables
         self.lumPosition = 0
@@ -86,6 +89,8 @@ class Application(QMainWindow, QWidget):
         self.path = ''
         self.img = ''           # preview
         self.real_img = ''      # image with real size
+        self.real_img_2 = ''    # copy of real img used to apply multiple effects
+        self.real_img_3 = ''
         self.test_img = ''      # image used to test filters
         self.rsize = 400        # preview dimension
 
@@ -97,9 +102,11 @@ class Application(QMainWindow, QWidget):
         self.setStyleSheet("background-color: #423f3f; QText{color: #b4acac}")
         self.initUI()
 
+
     def initUI(self):
 
         self.checkUpdate()
+        self.idApp()
         self.importImage(background=True)
 
         self.setWindowTitle('picBloom')
@@ -108,6 +115,24 @@ class Application(QMainWindow, QWidget):
 
         self.menu()
         self.show()
+
+    # Create a file where to write an unique app_id if it not exist
+    # else open the file and read the id
+    def idApp(self):
+        try:
+            id_app = open('id_app', 'r+')
+            self.id = id_app.read()
+
+        except:
+            id_app = open('id_app', 'w+')
+            id_rand = random.randint(0,100000000)
+            id_app.write(str(id_rand))
+            self.id = id_rand
+
+        print("id: ", self.id)
+        id_app.close()
+
+        return self.id
 
     # funtion that check if exist a new picbloom version
     def checkUpdate(self):
@@ -187,6 +212,7 @@ class Application(QMainWindow, QWidget):
         btn.clicked.connect(function)
         return btn
 
+
     # Filters section:
     # Filters follow this work flow -
     # if "apply" variable of the filter is True, apply the filter
@@ -208,7 +234,11 @@ class Application(QMainWindow, QWidget):
 
         if self.apply_sat_filter:
             self.real_img = filters.saturationFilter(index, self.real_img)
-            self.img = filters.saturationFilter(index, self.img)
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
         else:
             #self.img = self.test_img
@@ -227,7 +257,11 @@ class Application(QMainWindow, QWidget):
 
         if self.apply_contr_filter:
             self.real_img = filters.contrastFilter(index, self.real_img)
-            self.img = filters.contrastFilter(index, self.img)
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
         else:
             #self.img = self.test_img
@@ -248,7 +282,11 @@ class Application(QMainWindow, QWidget):
 
         if self.apply_lum_filter:
             self.real_img = filters.luminanceFilter(index, self.real_img)
-            self.img = filters.luminanceFilter(index,self.img)
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
         else:
             #self.img = self.test_img
@@ -261,9 +299,17 @@ class Application(QMainWindow, QWidget):
         self.blur_filter_pressed = "arith"
 
         if self.apply_arith_mean:
+            print("apply arithmetic")
             self.real_img = filters.arithmeticMeanFilter(self.real_img)
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
         else:
+            self.img = self.real_img
+            self.resize(self.rsize)
             self.img = filters.arithmeticMeanFilter(self.img)
             self.showImage(self.img)
 
@@ -273,10 +319,18 @@ class Application(QMainWindow, QWidget):
 
         self.blur_filter_pressed = "geomet"
 
-        if self.apply_arith_mean:
+        if self.apply_geomet_mean:
+            print("apply gometric")
             self.real_img = filters.geometricMeanFilter(self.real_img)
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
         else:
+            self.img = self.real_img
+            self.resize(self.rsize)
             self.img = filters.geometricMeanFilter(self.img)
             self.showImage(self.img)
 
@@ -285,9 +339,17 @@ class Application(QMainWindow, QWidget):
         self.blur_filter_pressed = "harmonic"
 
         if self.apply_harmonic_mean:
+            print("apply harmonic")
             self.real_img = filters.harmonicMeanFilter(self.real_img)
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
         else:
+            self.img = self.real_img
+            self.resize(self.rsize)
             self.img = filters.harmonicMeanFilter(self.img)
             self.showImage(self.img)
 
@@ -296,13 +358,21 @@ class Application(QMainWindow, QWidget):
         self.blur_filter_pressed = "median"
 
         if self.apply_median_filter:
+            print("apply median")
             self.real_img = filters.medianFilter(self.real_img)
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
         else:
+            self.img = self.real_img
+            self.resize(self.rsize)
             self.img = filters.medianFilter(self.img)
             self.showImage(self.img)
 
-    def cannyFilter(self, sigma = 2):
+    def cannyFilter(self, sigma = 1):
 
         self.edge_filter_pressed = "canny"
         self.sigma_canny = sigma
@@ -312,6 +382,11 @@ class Application(QMainWindow, QWidget):
 
         if self.apply_canny_filter:
             self.real_img = filters.cannyEdgeDetectorFilter(self.real_img, sigma)
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
         else:
             self.img = filters.cannyEdgeDetectorFilter(self.img, sigma)
@@ -323,6 +398,11 @@ class Application(QMainWindow, QWidget):
 
         if self.apply_drog_filter:
             self.real_img = filters.drogEdgeDetectorFilter(self.real_img)
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
             print("Drog applied")
         else:
@@ -332,6 +412,7 @@ class Application(QMainWindow, QWidget):
     def translateX(self, index):
         if self.transform_pressed != "translateX":
             self.img = self.test_img
+            self.real_img_2 = self.real_img_3
 
         self.transform_pressed = "translateX"
 
@@ -341,6 +422,7 @@ class Application(QMainWindow, QWidget):
     def translateY(self, index):
         if self.transform_pressed != "translateY":
             self.img = self.test_img
+            self.real_img_2 = self.real_img_3
 
         self.transform_pressed = "translateY"
 
@@ -353,28 +435,41 @@ class Application(QMainWindow, QWidget):
         self.trasPositionY = y
 
         if self.apply_translation:
-            self.real_img = filters.translate(self.real_img, x, y)
-            self.img = filters.translate(self.img, x, y)
+            print("apply translation")
+            self.real_img = self.real_img_3 #filters.translate(self.real_img, x, y)
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.test_img = self.img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
         else:
             self.test_img = filters.translate(self.img, x, y)
+            self.real_img_3 = filters.translate(self.real_img_2, x, y)
             self.showImage(self.test_img)
 
     def rotate(self, angle):
 
         if self.transform_pressed != "rotate":
             self.img = self.test_img
+            self.real_img_2 = self.real_img_3
 
         self.transform_pressed = "rotate"
 
         self.rotatePosition = angle
 
         if self.apply_rotation:
-            self.real_img = filters.rotate(self.real_img, angle, resize = self.transform_check.isChecked())
-            self.img = filters.rotate(self.img, angle, resize = self.transform_check.isChecked())
+            self.real_img = self.real_img_3 #filters.rotate(self.real_img, angle, resize = self.transform_check.isChecked())
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
         else:
             self.test_img = filters.rotate(self.img, angle, resize = self.transform_check.isChecked())
+            self.real_img_3 = filters.rotate(self.real_img_2, angle, resize=self.transform_check.isChecked())
             self.showImage(self.test_img)
 
 
@@ -382,17 +477,23 @@ class Application(QMainWindow, QWidget):
 
         if self.transform_pressed != "scaling":
             self.img = self.test_img
+            self.real_img_2 = self.real_img_3
 
         self.transform_pressed = "scaling"
 
         self.scalePosition = index
 
         if self.apply_scaling:
-            self.real_img = filters.scaling(self.real_img, self.scalePosition, self.transform_check.isChecked())
-            self.img = filters.scaling(self.img, self.scalePosition, self.transform_check.isChecked())
+            self.real_img = self.real_img_3 #filters.scaling(self.real_img, self.scalePosition, self.transform_check.isChecked())
+            self.real_img_2 = self.real_img
+            self.real_img_3 = self.real_img
+            self.img = self.real_img
+            self.resize(self.rsize)
+            self.test_img = self.img
             self.showImage(self.img)
         else:
             self.test_img = filters.scaling(self.img, index, self.transform_check.isChecked())
+            self.real_img_3 = filters.scaling(self.real_img_2, index, self.transform_check.isChecked())
             self.showImage(self.test_img)
 
     # Used to load the Image in the label and set related parameters
@@ -408,6 +509,8 @@ class Application(QMainWindow, QWidget):
 
 
         self.real_img = Image.open(self.path)
+        self.real_img_2 = self.real_img
+        self.real_img_3 = self.real_img
         self.img = self.real_img
         self.resize(self.rsize)
         self.test_img = self.img
@@ -437,8 +540,8 @@ class Application(QMainWindow, QWidget):
         menubar.setNativeMenuBar(False)
         fileMenu = menubar.addMenu('&File')
         fileMenu.addAction(saveAct)
-        fileMenu.addAction(exitAct)
         fileMenu.addAction(importAct)
+        fileMenu.addAction(exitAct)
         fileMenu = menubar.addMenu('&Functions')
         fileMenu.addAction(colorsAct)
         fileMenu.addAction(filtersAct)
@@ -449,13 +552,13 @@ class Application(QMainWindow, QWidget):
         toolbar = self.addToolBar('Toolbar')
         toolbar.orientation()
         toolbar.setStyleSheet("background-color: #201e1e; color: #cccaca; border: 1px #201e1e; padding: 3px;")
-        toolbar.addAction(exitAct)
         toolbar.addAction(saveAct)
         toolbar.addAction(colorsAct)
         toolbar.addAction(filtersAct)
         toolbar.addAction(edgesAct)
         toolbar.addAction(srmAct)
         toolbar.addAction(transAct)
+        toolbar.addAction(exitAct)
 
     # Buttons showed in toolbar and menu
     def importButton(self):
@@ -630,7 +733,7 @@ class Application(QMainWindow, QWidget):
     def applyTransforms(self, btn):
         self.transform_check = QCheckBox("Resize window")
         if btn.text() == "Apply":
-            if self.transform_pressed == "translate":
+            if self.transform_pressed == "translateX" or self.transform_pressed == "translateY":
                 self.apply_translation = True
                 self.translate(self.trasPositionX, self.trasPositionY)
                 self.apply_translation = False

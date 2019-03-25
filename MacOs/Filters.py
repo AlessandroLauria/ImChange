@@ -307,6 +307,7 @@ class Filters():
 
 
         img = Image.fromarray(result_binary)
+        img = img.convert('L')
         return img
 
 
