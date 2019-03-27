@@ -184,11 +184,15 @@ class Filters():
         img = Image.fromarray(image)
         return img
 
-    def cannyEdgeDetectorFilter(self, img, sigma=1, t_low=0.01, t_high=0.2):
+    def cannyEdgeDetectorFilter(self, img, sigma=3, t_low=0.01, t_high=0.2):
 
+        print("sigma: ",sigma)
+        img = np.array(img)
+
+        ''' SLOW OLD IMPLEMENTATION
         im = img.convert('L')
         img = np.array(im, dtype=float)
-
+        
         # 1) Convolve gaussian kernel with gradient
         # gaussian kernel
         halfSize = 3 * sigma
@@ -304,8 +308,8 @@ class Filters():
             for j in range(0, mag_thin.shape[1] - 1):  # columns
                 if mag_thin[i][j] >= tHigh:
                     result_binary[i][j] = 255  # set to 255 for >= tHigh
-
-
+        '''
+        result_binary = cv2.Canny(img, 150, 200)
         img = Image.fromarray(result_binary)
         img = img.convert('L')
         return img

@@ -34,7 +34,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 # Current app version
-version = "1.0.1"
+version = "1.0.2"
 
 # Debug variable to enable/disable some functionality
 debug = True
@@ -109,7 +109,7 @@ class Application(QMainWindow, QWidget):
     def initUI(self):
 
         self.checkUpdate()
-        if not debug: self.idApp()
+        self.idApp()
         self.importImage(background=True)
 
         self.setWindowTitle('picBloom')
@@ -119,28 +119,6 @@ class Application(QMainWindow, QWidget):
         self.menu()
         self.show()
 
-    # Create a file where to write an unique app_id if it not exist
-    # else open the file and read the id
-    def idApp(self):
-        try:
-            id_app = open(sys._MEIPASS +'id_app', 'r+')
-            self.id = id_app.read()
-            urllib.request.urlopen("http://picbloom.altervista.org/home/user_actions.php?id_app="+self.id+"&action=open")
-
-        except:
-            id_app = open(sys._MEIPASS +'id_app', 'w+')
-            id_rand = random.randint(0,100000000)
-            id_app.write(str(id_rand))
-            self.id = id_rand
-            try:
-                urllib.request.urlopen("http://picbloom.altervista.org/home/user_actions.php?id_app="+self.id+"&action=new")
-            except:
-                print("request new failed")
-
-        print("id: ", self.id)
-        id_app.close()
-
-        return self.id
 
     # funtion that check if exist a new picbloom version
     def checkUpdate(self):
@@ -165,6 +143,13 @@ class Application(QMainWindow, QWidget):
                     reply = alert.exec_()
                     if reply == QMessageBox.Yes:
                         print('download')
+                        try:
+                            update = urllib.request.urlopen("http://picbloom.altervista.org/home/user_actions.php?id_app="\
+                                                   + self.id + "&action=update&version=" + version)
+                            print(update)
+                        except:
+                            print("error query update")
+
                         url = "http://picbloom.altervista.org/home/index.html"
                         webbrowser.open_new_tab(url)
                         # urllib.request.urlopen("http://picbloom.altervista.org/download/picBloom-macOs.zip").read()
@@ -380,7 +365,7 @@ class Application(QMainWindow, QWidget):
             self.img = filters.medianFilter(self.img)
             self.showImage(self.img)
 
-    def cannyFilter(self, sigma = 1):
+    def cannyFilter(self, sigma = 3):
 
         self.edge_filter_pressed = "canny"
         self.sigma_canny = sigma
@@ -454,7 +439,8 @@ class Application(QMainWindow, QWidget):
             self.showImage(self.img)
         else:
             self.test_img = filters.translate(self.img, x, y)
-            self.real_img_3 = filters.translate(self.real_img_2, x, y)
+            self.real_img_3 = filters.translate(self.real_img_2, int(x*(self.real_img_2.width/self.test_img.width)),\
+                                                int(y*(self.real_img_2.height/self.test_img.height)))
             self.showImage(self.test_img)
 
     def rotate(self, angle):
@@ -501,7 +487,7 @@ class Application(QMainWindow, QWidget):
             self.showImage(self.img)
         else:
             self.test_img = filters.scaling(self.img, index, self.transform_check.isChecked())
-            self.real_img_3 = filters.scaling(self.real_img_2, index, self.transform_check.isChecked())
+            self.real_img_3 = filters.scaling(self.real_img_2, int(index*(self.real_img_2.width/self.test_img.width)), self.transform_check.isChecked())
             self.showImage(self.test_img)
 
     # Used to load the Image in the label and set related parameters
@@ -562,10 +548,10 @@ class Application(QMainWindow, QWidget):
         toolbar.setStyleSheet("background-color: #201e1e; color: #cccaca; border: 1px #201e1e; padding: 3px;")
         toolbar.addAction(saveAct)
         toolbar.addAction(colorsAct)
-        toolbar.addAction(filtersAct)
-        toolbar.addAction(edgesAct)
-        toolbar.addAction(srmAct)
         toolbar.addAction(transAct)
+        toolbar.addAction(edgesAct)
+        toolbar.addAction(filtersAct)
+        toolbar.addAction(srmAct)
         toolbar.addAction(exitAct)
 
     # Buttons showed in toolbar and menu
@@ -651,10 +637,10 @@ class Application(QMainWindow, QWidget):
     def cannyFilterBox(self):
         canny_text = QLabel("Sigma Canny", self)
         #sig = QLabel(str(self.sigma_canny), self)
-        #canny_btn = self.button(self.cannyFilter, "Canny")
+        canny_btn = self.button(self.cannyFilter, "Canny")
         drog_btn = self.button(self.drogFilter, "Drog")
-        sigma_slider = self.slider(self.cannyFilter, self.sigma_canny, minimum=1,maximum=10)
-        widget = [canny_text, sigma_slider, drog_btn]
+        #sigma_slider = self.slider(self.cannyFilter, self.sigma_canny, minimum=3,maximum=7)
+        widget = [canny_text, canny_btn, drog_btn]
         result = MessageBox(widget, None)
         result.setDefaultButton(QMessageBox.Apply)
         result.setStandardButtons(QMessageBox.Apply | QMessageBox.Cancel)
@@ -853,6 +839,37 @@ class Application(QMainWindow, QWidget):
         exitAct.setStatusTip('Exit application')
         exitAct.triggered.connect(self.close)
         return exitAct
+
+    # Create a file where to write an unique app_id if it not exist
+    # else open the file and read the id
+    def idApp(self):
+        try:
+            if debug:
+                id_app = open('id_app', 'r+')
+            else:
+                id_app = open(sys._MEIPASS + 'id_app', 'r+')
+
+            self.id = id_app.read()
+            urllib.request.urlopen(
+                "http://picbloom.altervista.org/home/user_actions.php?id_app=" + self.id + "&action=open&version=" + version)
+
+        except:
+            if debug:
+                id_app = open('id_app', 'w+')
+            else:
+                id_app = open(sys._MEIPASS + 'id_app', 'w+')
+            id_rand = random.randint(0, 100000000)
+            id_app.write(str(id_rand))
+            self.id = id_rand
+            try:
+                urllib.request.urlopen("http://picbloom.altervista.org/home/user_actions.php?id_app=" + self.id + "&action=new&version=" + version)
+            except:
+                print("request new failed")
+
+        print("id: ", self.id)
+        id_app.close()
+
+        return self.id
 
     '''
     def dragEnterEvent(self, e):
